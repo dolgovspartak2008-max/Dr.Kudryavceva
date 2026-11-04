@@ -3,22 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Политика обработки персональных данных — Доктор Кудрявцева</title>
+<title>Политика конфиденциальности — Доктор Кудрявцева</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Политика обработки персональных данных сайта доктора Кудрявцевой.">
-<meta name="theme-color" content="#fbf7f1">
-
+<meta name="description" content="Политика обработки персональных данных пользователей сайта «Доктор Кудрявцева».">
+<link rel="canonical" href="https://dr-kudryavceva.vercel.app/privacy.html">
+<meta name="theme-color" content="#fbf7f2">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ru_RU">
 <meta property="og:site_name" content="Доктор Кудрявцева">
-<meta property="og:title" content="Политика обработки персональных данных — Доктор Кудрявцева">
-<meta property="og:description" content="Политика обработки персональных данных сайта доктора Кудрявцевой.">
-
+<meta property="og:title" content="Политика конфиденциальности — Доктор Кудрявцева">
+<meta property="og:description" content="Политика обработки персональных данных пользователей сайта «Доктор Кудрявцева».">
+<meta property="og:url" content="https://dr-kudryavceva.vercel.app/privacy.html">
+<meta property="og:image" content="https://dr-kudryavceva.vercel.app/assets/img/kudryavtseva-860.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Crect%20width%3D%2224%22%20height%3D%2224%22%20rx%3D%226%22%20fill%3D%22%23fbf7f1%22%2F%3E%3Cpath%20d%3D%22M7.5%203C5%203%203.5%205%203.5%207.6c0%202.3%201%203.7%201.5%205.6.6%202.4.6%207.8%202.6%207.8%201.6%200%201.6-3.3%202.1-5%20.4-1.4.9-2.3%202.3-2.3s1.9.9%202.3%202.3c.5%201.7.5%205%202.1%205%202%200%202-5.4%202.6-7.8.5-1.9%201.5-3.3%201.5-5.6C20.5%205%2019%203%2016.5%203c-2%200-3%201-4.5%201S9.5%203%207.5%203z%22%20fill%3D%22none%22%20stroke%3D%22%23a87842%22%20stroke-width%3D%221.6%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/css/style.css?v=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css?v=2">
+
 
 </head>
 <body data-base="">
@@ -30,70 +33,103 @@
     <nav class="main-nav" aria-label="Основное меню"><ul><li><a href="./">Главная</a></li><li><a href="services.html">Услуги</a></li><li><a href="about.html">О докторе</a></li><li><a href="cases.html">Примеры работ</a></li><li><a href="contacts.html">Контакты</a></li></ul></nav>
     <a class="header-phone" data-cfg="phone" href="#" hidden><svg class="icon " aria-hidden="true"><use href="#i-phone"></use></svg><span data-cfg-text></span></a>
     <a class="btn btn--primary btn--sm header-cta" href="contacts.html#zapis">Записаться на приём</a>
-    <button class="burger" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu"><svg class="icon " aria-hidden="true"><use href="#i-menu"></use></svg></button>
+    <div class="header-actions">
+      <a class="round-btn round-btn--gold" data-contact-btn href="contacts.html#zapis" aria-label="Записаться на приём"><svg class="icon " aria-hidden="true"><use href="#i-calendar"></use></svg></a>
+      <button class="round-btn burger" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu"><svg class="icon " aria-hidden="true"><use href="#i-menu"></use></svg></button>
+    </div>
   </div>
 </header>
-<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Меню">
   <div class="mobile-menu-top">
-    <a class="logo" href="./"><svg class="icon " aria-hidden="true"><use href="#i-tooth"></use></svg><span class="logo-text"><span>Доктор</span><span>Кудрявцева</span></span></a>
-    <button class="burger" style="display:inline-flex" type="button" aria-label="Закрыть меню" data-menu-close><svg class="icon " aria-hidden="true"><use href="#i-close"></use></svg></button>
+    <a class="logo" href="./" aria-label="Доктор Кудрявцева — на главную"><svg class="icon " aria-hidden="true"><use href="#i-tooth"></use></svg><span class="logo-text"><span>Доктор</span><span>Кудрявцева</span></span></a>
+    <button class="round-btn" type="button" aria-label="Закрыть меню" data-menu-close><svg class="icon " aria-hidden="true"><use href="#i-close"></use></svg></button>
   </div>
   <nav aria-label="Мобильное меню"><ul><li><a href="./">Главная<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="services.html">Услуги<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="about.html">О докторе<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="cases.html">Примеры работ<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="contacts.html">Контакты<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li></ul></nav>
   <div class="mobile-menu-foot">
-    <a class="btn btn--ghost" data-cfg="phone" href="#" hidden><svg class="icon " aria-hidden="true"><use href="#i-phone"></use></svg><span data-cfg-text></span></a>
     <a class="btn btn--primary" href="contacts.html#zapis"><svg class="icon " aria-hidden="true"><use href="#i-calendar"></use></svg>Записаться на приём</a>
+    <a class="btn btn--ghost" data-cfg="phone" href="#" hidden><svg class="icon " aria-hidden="true"><use href="#i-phone"></use></svg><span data-cfg-text></span></a>
+    <div class="messengers">
+      <a class="btn btn--ghost" data-cfg="telegram" href="#" hidden><svg class="icon " aria-hidden="true"><use href="#i-send"></use></svg>Telegram</a>
+      <a class="btn btn--ghost" data-cfg="whatsapp" href="#" hidden><svg class="icon " aria-hidden="true"><use href="#i-chat"></use></svg>WhatsApp</a>
+    </div>
   </div>
 </div>
 <main id="main">
 
 <section class="page-hero">
   <div class="container hero-anim">
-    <nav class="breadcrumbs" aria-label="Хлебные крошки"><ol><li><a href="./">Главная</a></li><li aria-current="page">Политика обработки данных</li></ol></nav>
+    <nav class="breadcrumbs" aria-label="Хлебные крошки"><ol><li><a href="./">Главная</a></li><li aria-current="page">Политика конфиденциальности</li></ol></nav>
     <h1>Политика обработки персональных данных</h1>
   </div>
 </section>
-<section class="section" style="padding-top:0">
+<section class="section section--flush-top">
   <div class="container prose">
-    <div class="todo"><svg class="icon " aria-hidden="true"><use href="#i-pen"></use></svg><span><b>Раздел для заполнения.</b> Текст политики составляется с учётом требований 152-ФЗ «О персональных данных» и должен содержать сведения об операторе (ФИО/наименование, ИНН, адрес), цели и состав обрабатываемых данных, сроки хранения и порядок отзыва согласия. Рекомендуем согласовать текст с юристом.</span></div>
-    <h2>Какие данные собирает форма записи</h2>
-    <p>Имя, номер телефона, выбранная услуга и комментарий — только для того, чтобы связаться с вами и записать на приём.</p>
+    <div class="requisites" data-requisites hidden>
+  <b>Сведения об операторе</b>
+  <span data-cfg="operator" data-cfg-mode="text" hidden></span>
+  <span data-cfg="inn" data-cfg-mode="text" data-cfg-prefix="ИНН " hidden></span>
+  <span data-cfg="ogrn" data-cfg-mode="text" data-cfg-prefix="ОГРН/ОГРНИП " hidden></span>
+  <span data-cfg="legalAddress" data-cfg-mode="text" data-cfg-prefix="Адрес: " hidden></span>
+  <span data-cfg="email" data-cfg-mode="text" data-cfg-prefix="E-mail для обращений: " hidden></span>
+  <span data-cfg="license" data-cfg-mode="text" hidden></span>
+</div>
+    <h2>1. Общие положения</h2>
+    <p>Настоящая политика определяет порядок обработки и защиты персональных данных пользователей сайта «Доктор Кудрявцева» (далее — Сайт) в соответствии с Федеральным законом от 27.07.2006 № 152-ФЗ «О персональных данных». Оператором персональных данных является лицо, сведения о котором указаны на этой странице (далее — Оператор).</p>
+    <h2>2. Какие данные обрабатываются</h2>
+    <ul>
+      <li>имя (как к пользователю обращаться);</li>
+      <li>номер телефона;</li>
+      <li>выбранная услуга и комментарий, если пользователь его оставил;</li>
+      <li>технические данные, которые браузер передаёт автоматически при посещении Сайта (IP-адрес, сведения о браузере).</li>
+    </ul>
+    <p>Через форму Сайта не запрашиваются сведения о состоянии здоровья. Пожалуйста, не указывайте их в комментарии — подробности обсуждаются на приёме.</p>
+    <h2>3. Цели обработки</h2>
+    <ul>
+      <li>связь с пользователем по его заявке и запись на консультацию;</li>
+      <li>ответы на обращения пользователя.</li>
+    </ul>
+    <h2>4. Правовые основания</h2>
+    <p>Обработка осуществляется на основании согласия пользователя, которое он даёт, отмечая соответствующее поле в форме записи.</p>
+    <h2>5. Порядок и сроки обработки</h2>
+    <p>Данные обрабатываются с использованием средств автоматизации и без них: сбор, запись, хранение, использование, удаление. Данные хранятся не дольше, чем этого требуют цели обработки, либо до отзыва согласия. Оператор не передаёт данные третьим лицам, за исключением случаев, предусмотренных законодательством РФ, и сервисов, необходимых для доставки заявки Оператору.</p>
+    <h2>6. Права пользователя</h2>
+    <p>Пользователь вправе получить сведения об обработке своих данных, потребовать их уточнения, блокирования или удаления, а также отозвать согласие, направив Оператору обращение по контактам, указанным на Сайте.</p>
+    <h2>7. Защита данных</h2>
+    <p>Оператор принимает правовые, организационные и технические меры для защиты персональных данных от неправомерного доступа, изменения, раскрытия или уничтожения.</p>
+    <h2>8. Изменение политики</h2>
+    <p>Оператор может обновлять настоящую политику. Актуальная версия всегда доступна на этой странице.</p>
   </div>
 </section>
 
 </main>
 <footer class="site-footer">
   <div class="container">
-    <div class="footer-grid">
-      <div class="footer-col">
-        <a class="logo" href="./"><svg class="icon " aria-hidden="true"><use href="#i-tooth"></use></svg><span class="logo-text"><span>Доктор</span><span>Кудрявцева</span></span></a>
-        <p class="muted">Анна Дмитриевна Кудрявцева — стоматолог-эндодонтист-микроскопист, ортопед, хирург-имплантолог.</p>
-        <ul>
-          <li><a data-cfg="phone" href="#" hidden><span data-cfg-text></span></a></li>
-          <li><a data-cfg="telegram" href="#" hidden>Telegram</a></li>
-          <li><a data-cfg="whatsapp" href="#" hidden>WhatsApp</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h2>Разделы</h2>
-        <ul><li><a href="./">Главная</a></li><li><a href="services.html">Услуги</a></li><li><a href="about.html">О докторе</a></li><li><a href="cases.html">Примеры работ</a></li><li><a href="contacts.html">Контакты</a></li></ul>
-      </div>
-      <div class="footer-col">
-        <h2>Услуги</h2>
-        <ul><li><a href="services/esteticheskaya-restavraciya.html">Эстетическая реставрация зубов</a></li><li><a href="services/slozhnoe-perelechivanie.html">Сложное перелечивание зубов</a></li><li><a href="services/protezirovanie.html">Протезирование зубов</a></li><li><a href="services/implantaciya.html">Имплантация</a></li><li><a href="services/kostnaya-plastika.html">Костные пластики</a></li><li><a href="services/udalenie-zubov-mudrosti.html">Удаление зубов мудрости</a></li></ul>
+    <div class="footer-top">
+      <a class="logo" href="./"><svg class="icon " aria-hidden="true"><use href="#i-tooth"></use></svg><span class="logo-text"><span>Доктор</span><span>Кудрявцева</span></span></a>
+      <nav class="footer-nav" aria-label="Разделы сайта"><ul><li><a href="./">Главная</a></li><li><a href="services.html">Услуги</a></li><li><a href="about.html">О докторе</a></li><li><a href="cases.html">Примеры работ</a></li><li><a href="contacts.html">Контакты</a></li></ul></nav>
+      <div class="footer-contacts">
+        <a data-cfg="phone" href="#" hidden><svg class="icon " aria-hidden="true"><use href="#i-phone"></use></svg><span data-cfg-text></span></a>
+        <a data-cfg="mapUrl" data-cfg-keep-text href="#" hidden><svg class="icon " aria-hidden="true"><use href="#i-pin"></use></svg><span data-cfg-from="address">На карте</span></a>
+        <a class="circle-link" data-cfg="telegram" href="#" hidden aria-label="Telegram"><svg class="icon " aria-hidden="true"><use href="#i-send"></use></svg></a>
+        <a class="circle-link" data-cfg="whatsapp" href="#" hidden aria-label="WhatsApp"><svg class="icon " aria-hidden="true"><use href="#i-chat"></use></svg></a>
       </div>
     </div>
+    <div class="footer-services"><a href="services/esteticheskaya-restavraciya.html">Эстетическая реставрация зубов</a><a href="services/slozhnoe-perelechivanie.html">Сложное перелечивание зубов</a><a href="services/protezirovanie.html">Протезирование зубов</a><a href="services/implantaciya.html">Имплантация</a><a href="services/kostnaya-plastika.html">Костные пластики</a><a href="services/udalenie-zubov-mudrosti.html">Удаление зубов мудрости</a></div>
     <div class="footer-bottom">
-      <span>© <span data-year>2026</span> Доктор Кудрявцева. <a href="privacy.html">Политика обработки персональных данных</a></span>
+      <div class="footer-legal">
+        <span>© <span data-year>2026</span> Доктор Кудрявцева. <a href="privacy.html">Политика конфиденциальности</a> · <a href="consent.html">Согласие на обработку данных</a></span>
+        <span data-cfg="license" data-cfg-mode="text" hidden></span>
+      </div>
       <span>Имеются противопоказания. Необходима консультация специалиста.</span>
     </div>
   </div>
 </footer>
 <div class="mobile-cta">
-  <a class="btn btn--ghost" data-cfg="phone" href="#" hidden aria-label="Позвонить"><svg class="icon " aria-hidden="true"><use href="#i-phone"></use></svg>Позвонить</a>
+  <a class="btn btn--ghost" data-cfg="phone" data-cfg-keep-text href="#" hidden aria-label="Позвонить"><svg class="icon " aria-hidden="true"><use href="#i-phone"></use></svg>Позвонить</a>
   <a class="btn btn--primary" href="contacts.html#zapis"><svg class="icon " aria-hidden="true"><use href="#i-calendar"></use></svg>Записаться</a>
 </div>
-<script src="assets/js/config.js?v=1"></script>
+<script src="assets/js/config.js?v=2"></script>
 
-<script src="assets/js/main.js?v=1"></script>
+<script src="assets/js/main.js?v=2"></script>
 </body>
 </html>

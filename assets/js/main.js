@@ -16,58 +16,79 @@
 
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
-  function icon(id, cls) {
-    return '<svg class="icon ' + (cls || "") + '" aria-hidden="true"><use href="#' + id + '"></use></svg>';
-  }
+  function icon(id) { return '<svg class="icon" aria-hidden="true"><use href="#' + id + '"></use></svg>'; }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
+  function val(key) { return String(CFG[key] || "").trim(); }
 
-  /* ---------- Контакты из config.js ---------- */
-  function hrefFor(key, val) {
-    if (key === "phone") return "tel:" + val.replace(/[^\d+]/g, "");
-    if (key === "email") return "mailto:" + val;
-    if (/^https?:\/\//.test(val)) return val;
+  /* ---------- Данные из config.js ---------- */
+  function hrefFor(key, v) {
+    if (key === "phone") return "tel:" + v.replace(/[^\d+]/g, "");
+    if (key === "email") return "mailto:" + v;
+    if (/^https?:\/\//.test(v)) return v;
     return "";
   }
   $$("[data-cfg]").forEach(function (el) {
     var key = el.getAttribute("data-cfg");
     var mode = el.getAttribute("data-cfg-mode") || "link";
-    var val = (CFG[key] || "").trim();
+    var v = val(key);
+    if (!v) { el.hidden = true; return; }
     if (mode === "link") {
-      if (!val) { el.hidden = true; return; }
-      var h = hrefFor(key, val);
-      if (h) el.setAttribute("href", h);
+      var h = hrefFor(key, v);
+      if (!h) { el.hidden = true; return; }
+      el.setAttribute("href", h);
       if (/^https?:/.test(h)) { el.target = "_blank"; el.rel = "noopener"; }
-      var t = el.querySelector("[data-cfg-text]");
-      if (t) t.textContent = key === "phone" || key === "email" ? val : t.textContent;
-      el.hidden = false;
-    } else if (mode === "value") {
-      if (!val) { el.classList.add("is-empty"); return; }
-      var href = hrefFor(key, val);
-      var label = el.getAttribute("data-cfg-label") || val;
-      if (key === "phone" || key === "email") label = val;
-      el.classList.remove("is-empty");
-      el.innerHTML = href
-        ? '<a href="' + esc(href) + '"' + (/^https?:/.test(href) ? ' target="_blank" rel="noopener"' : "") + ">" + esc(label) + "</a>"
-        : esc(val);
-    } else if (mode === "show") {
-      el.hidden = !val;
+      if (!el.hasAttribute("data-cfg-keep-text")) $$("[data-cfg-text]", el).forEach(function (t) { t.textContent = v; });
+    } else if (mode === "text") {
+      el.textContent = (el.getAttribute("data-cfg-prefix") || "") + v;
     }
+    $$("[data-cfg-from]", el).forEach(function (t) {
+      var fv = val(t.getAttribute("data-cfg-from"));
+      if (fv) t.textContent = fv;
+    });
+    el.hidden = false;
+  });
+  $$("[data-requisites]").forEach(function (box) {
+    box.hidden = !["operator", "inn", "ogrn", "legalAddress"].some(function (k) { return val(k); });
+  });
+  // Кнопка связи в мобильной шапке: звонок, если указан телефон, иначе — запись
+  $$("[data-contact-btn]").forEach(function (b) {
+    if (!val("phone")) return;
+    b.setAttribute("href", hrefFor("phone", val("phone")));
+    b.setAttribute("aria-label", "Позвонить: " + val("phone"));
+    b.innerHTML = icon("i-phone");
   });
 
-  /* ---------- Шапка ---------- */
+  function contactsHtml() {
+    var parts = [];
+    if (val("phone")) parts.push('по телефону <a href="' + esc(hrefFor("phone", val("phone"))) + '">' + esc(val("phone")) + "</a>");
+    if (val("telegram")) parts.push('в <a href="' + esc(val("telegram")) + '" target="_blank" rel="noopener">Telegram</a>');
+    if (val("whatsapp")) parts.push('в <a href="' + esc(val("whatsapp")) + '" target="_blank" rel="noopener">WhatsApp</a>');
+    return parts.length ? " Свяжитесь, пожалуйста, " + parts.join(", ") + "." : " Пожалуйста, попробуйте позже.";
+  }
+
+  /* ---------- Шапка и мобильная кнопка записи ---------- */
   var header = $(".site-header");
   var mcta = $(".mobile-cta");
   function onScroll() {
     var y = window.scrollY || window.pageYOffset;
     if (header) header.classList.toggle("is-scrolled", y > 8);
-    if (mcta) mcta.classList.toggle("is-visible", y > 520);
+    if (mcta) mcta.classList.toggle("is-visible", y > 560);
   }
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
+  // нижняя кнопка «Записаться» не нужна, когда форма записи уже на экране
+  if (mcta && "IntersectionObserver" in window) {
+    var formsInView = 0;
+    var fio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { formsInView += en.isIntersecting ? 1 : -1; });
+      mcta.classList.toggle("is-suppressed", formsInView > 0);
+    });
+    $$("form[data-booking]").forEach(function (f) { fio.observe(f); });
+  }
 
   /* ---------- Мобильное меню ---------- */
   var menu = $("#mobile-menu");
@@ -78,34 +99,39 @@
     menu.setAttribute("aria-hidden", open ? "false" : "true");
     if (burger) burger.setAttribute("aria-expanded", open ? "true" : "false");
     document.body.classList.toggle("menu-open", open);
-    if (open) { var f = menu.querySelector("a, button"); if (f) f.focus(); }
+    if (open) { var f = menu.querySelector("[data-menu-close]"); if (f) f.focus(); }
     else if (burger) burger.focus();
   }
   if (burger) burger.addEventListener("click", function () { setMenu(true); });
   $$("[data-menu-close]").forEach(function (b) { b.addEventListener("click", function () { setMenu(false); }); });
   if (menu) menu.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && menu && menu.classList.contains("is-open")) setMenu(false); });
+  window.addEventListener("resize", function () { if (window.innerWidth > 980 && menu && menu.classList.contains("is-open")) setMenu(false); });
 
-  /* ---------- Появление блоков при прокрутке ---------- */
+  /* ---------- Появление при прокрутке ---------- */
+  var io = null;
   if (!reduceMotion && "IntersectionObserver" in window) {
-    var vh = window.innerHeight;
-    var io = new IntersectionObserver(function (entries) {
+    io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         if (en.isIntersecting) { en.target.classList.add("is-in"); io.unobserve(en.target); }
       });
-    }, { rootMargin: "0px 0px -8% 0px" });
-    $$("[data-reveal]").forEach(function (el) {
+    }, { rootMargin: "0px 0px -6% 0px" });
+  }
+  function watchReveal(root) {
+    if (!io) return;
+    var vh = window.innerHeight;
+    $$("[data-reveal]", root).forEach(function (el) {
+      if (el.classList.contains("reveal-ready")) return;
       // анимируем только то, что ниже первого экрана — первый кадр всегда полный
-      if (el.getBoundingClientRect().top > vh * 0.95) {
-        el.classList.add("reveal-ready");
-        io.observe(el);
-      }
+      if (el.getBoundingClientRect().top > vh * 0.92) { el.classList.add("reveal-ready"); io.observe(el); }
     });
   }
+  watchReveal(document);
 
   /* ---------- Маска телефона ---------- */
   function formatPhone(v) {
     var d = v.replace(/\D/g, "");
+    if (!d) return "";
     if (d.charAt(0) === "8") d = "7" + d.slice(1);
     if (d.charAt(0) !== "7") d = "7" + d;
     d = d.slice(0, 11);
@@ -120,24 +146,24 @@
   $$('input[type="tel"]').forEach(function (inp) {
     inp.addEventListener("focus", function () { if (!inp.value) inp.value = "+7 ("; });
     inp.addEventListener("blur", function () { if (inp.value.replace(/\D/g, "").length <= 1) inp.value = ""; });
-    inp.addEventListener("input", function () {
-      var pos = inp.value.length;
+    inp.addEventListener("input", function (e) {
+      if (e.inputType && e.inputType.indexOf("delete") === 0) return; // не мешаем стирать
       inp.value = formatPhone(inp.value);
-      if (pos >= inp.value.length) inp.setSelectionRange(inp.value.length, inp.value.length);
     });
   });
 
   /* ---------- Предвыбор услуги (?service=slug) ---------- */
   try {
     var q = new URLSearchParams(location.search).get("service");
-    if (q) $$('select[name="service"]').forEach(function (s) {
-      if (s.querySelector('option[value="' + q + '"]')) s.value = q;
-    });
+    if (q) $$('select[name="service"]').forEach(function (s) { if (s.querySelector('option[value="' + q + '"]')) s.value = q; });
   } catch (e) { /* noop */ }
 
   /* ---------- Формы записи ---------- */
   $$("form[data-booking]").forEach(function (form) {
     var status = form.querySelector(".form-status");
+    var btn = form.querySelector('button[type="submit"]');
+    var btnHtml = btn ? btn.innerHTML : "";
+
     function setErr(field, msg) {
       var wrap = field.closest(".field") || field.closest(".check");
       if (!wrap) return;
@@ -146,70 +172,109 @@
       if (e) e.textContent = msg || "";
       field.setAttribute("aria-invalid", msg ? "true" : "false");
     }
+    function show(cls, html) {
+      if (!status) return;
+      status.hidden = false; status.className = "form-status " + cls; status.innerHTML = html;
+    }
+    function busy(on) {
+      if (!btn) return;
+      btn.disabled = on;
+      btn.innerHTML = on ? "Отправляем…" : btnHtml;
+    }
+    // повторная правка поля убирает ошибку
+    form.addEventListener("input", function (e) { if (e.target.getAttribute("aria-invalid") === "true") setErr(e.target); });
+    form.addEventListener("change", function (e) { if (e.target.getAttribute("aria-invalid") === "true") setErr(e.target); });
+
     form.addEventListener("submit", function (ev) {
       ev.preventDefault();
-      var name = form.elements.name, phone = form.elements.phone, consent = form.elements.consent;
+      var f = form.elements;
+      var name = f.name.value.trim();
+      var digits = f.phone.value.replace(/\D/g, "");
       var ok = true;
-      if (!name.value.trim() || name.value.trim().length < 2) { setErr(name, "Укажите, как к вам обращаться"); ok = false; } else setErr(name);
-      if (phone.value.replace(/\D/g, "").length !== 11) { setErr(phone, "Введите номер полностью: +7 и 10 цифр"); ok = false; } else setErr(phone);
-      if (consent && !consent.checked) { setErr(consent, "Нужно согласие на обработку данных"); ok = false; } else if (consent) setErr(consent);
+      if (name.length < 2 || !/[A-Za-zА-Яа-яЁё]/.test(name)) { setErr(f.name, "Укажите, как к вам обращаться"); ok = false; } else setErr(f.name);
+      if (digits.length !== 11 || digits.charAt(1) === "0") { setErr(f.phone, "Введите номер полностью: +7 и 10 цифр"); ok = false; } else setErr(f.phone);
+      if (f.service && !f.service.value) { setErr(f.service, "Выберите услугу или «Не знаю»"); ok = false; } else if (f.service) setErr(f.service);
+      if (f.consent && !f.consent.checked) { setErr(f.consent, "Отметьте согласие, чтобы отправить заявку"); ok = false; } else if (f.consent) setErr(f.consent);
       if (!ok) { var bad = form.querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
 
-      var service = form.elements.service;
-      var payload = {
-        name: name.value.trim(),
-        phone: phone.value,
-        service: service ? service.options[service.selectedIndex].text : "",
-        comment: form.elements.comment ? form.elements.comment.value.trim() : "",
-        page: location.pathname
-      };
-      var btn = form.querySelector('button[type="submit"]');
-      function done(cls, text) {
-        if (status) { status.hidden = false; status.className = "form-status " + cls; status.textContent = text; }
-        if (btn) btn.disabled = false;
-      }
-      if (btn) btn.disabled = true;
-
-      if (!CFG.formEndpoint) {
-        setTimeout(function () {
-          done("is-ok", "Спасибо, " + payload.name + "! Заявка заполнена верно. Онлайн-отправка пока не подключена — сайт работает в демонстрационном режиме.");
-          form.reset();
-        }, 400);
+      var endpoint = val("formEndpoint");
+      if (!endpoint) {
+        show("is-err", "Онлайн-запись пока не подключена — заявка не отправлена." + contactsHtml());
         return;
       }
-      fetch(CFG.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+      var payload = {
+        name: name,
+        phone: "+" + digits,
+        service: f.service ? f.service.options[f.service.selectedIndex].text : "",
+        comment: f.comment ? f.comment.value.trim() : "",
+        website: f.website ? f.website.value : "",
+        page: location.pathname
+      };
+      busy(true);
+      if (status) status.hidden = true;
+      var ctrl = "AbortController" in window ? new AbortController() : null;
+      var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 15000);
+      fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(payload),
+        signal: ctrl ? ctrl.signal : undefined
+      })
         .then(function (r) {
-          if (!r.ok) throw new Error(r.status);
-          done("is-ok", "Спасибо, " + payload.name + "! Заявка отправлена. Мы свяжемся с вами, чтобы подобрать время приёма.");
-          form.reset();
+          return r.json().catch(function () { return {}; }).then(function (data) { return { status: r.status, ok: r.ok, data: data }; });
+        })
+        .then(function (res) {
+          clearTimeout(timer); busy(false);
+          if (res.ok && res.data && res.data.ok) {
+            show("is-ok", "Спасибо, " + esc(name) + "! Заявка отправлена. Вам перезвонят, чтобы подобрать время приёма.");
+            form.reset();
+          } else if (res.status === 503) {
+            show("is-err", "Онлайн-запись временно недоступна — заявка не отправлена." + contactsHtml());
+          } else if (res.status === 400) {
+            show("is-err", "Проверьте, пожалуйста, имя и номер телефона и отправьте ещё раз.");
+          } else {
+            show("is-err", "Не удалось отправить заявку." + contactsHtml());
+          }
         })
         .catch(function () {
-          done("is-err", "Не удалось отправить заявку. Проверьте подключение к интернету и попробуйте ещё раз" + (CFG.phone ? " или позвоните: " + CFG.phone : "") + ".");
+          clearTimeout(timer); busy(false);
+          show("is-err", "Не удалось отправить заявку: нет связи с сервером. Проверьте интернет и попробуйте ещё раз." + (val("phone") ? contactsHtml() : ""));
         });
     });
   });
 
   /* ---------- Клинические случаи ---------- */
   var cases = (window.CASES || []).filter(function (c) { return c && c.photos && c.photos.length; });
-  var lightbox = null, lbList = [], lbIndex = 0, lbTitle = "";
+  function isConfirmed(c) {
+    return c.order === "confirmed" && c.photos.length >= 2 &&
+      c.photos[c.before != null ? c.before : 0] && c.photos[c.after != null ? c.after : 1];
+  }
+  function src(ph) { return /^(https?:)?\//.test(ph.src) ? ph.src : BASE + ph.src; }
 
   function caseMedia(c, idx) {
-    var p = c.photos;
-    if (c.order === "confirmed" && p.length >= 2) {
+    if (isConfirmed(c)) {
+      var b = c.photos[c.before != null ? c.before : 0], a = c.photos[c.after != null ? c.after : 1];
       return '<div class="ba" style="--pos:50%">' +
-        '<img src="' + esc(BASE + p[0].src) + '" alt="' + esc(p[0].alt || "До лечения") + '" loading="lazy" decoding="async">' +
-        '<img class="ba-after" src="' + esc(BASE + p[1].src) + '" alt="' + esc(p[1].alt || "После лечения") + '" loading="lazy" decoding="async">' +
-        '<span class="ba-handle"></span>' +
-        '<span class="badge badge--before">До</span><span class="badge badge--after">После</span>' +
-        '<input type="range" min="0" max="100" value="50" aria-label="Сравнение до и после: ' + esc(c.title) + '">' +
-        "</div>";
+        '<img src="' + esc(src(b)) + '" alt="' + esc(b.alt || "До лечения") + '" loading="lazy" decoding="async">' +
+        '<img class="ba-after" src="' + esc(src(a)) + '" alt="' + esc(a.alt || "После лечения") + '" loading="lazy" decoding="async">' +
+        '<span class="ba-handle"></span><span class="badge">До</span><span class="badge badge--after">После</span>' +
+        '<input type="range" min="0" max="100" value="50" aria-label="Сравнить до и после: ' + esc(c.title) + '"></div>';
     }
-    var pair = p.slice(0, 2).map(function (ph, i) {
-      return '<button type="button" data-lb="' + idx + '" data-lb-i="' + i + '" aria-label="Открыть фото ' + (i + 1) + '">' +
-        '<img src="' + esc(BASE + ph.src) + '" alt="' + esc(ph.alt || c.title) + '" loading="lazy" decoding="async"></button>';
-    }).join("");
-    var warn = (c.order !== "confirmed" && p.length >= 2) ? '<span class="badge badge--warn">Порядок «до/после» уточняется</span>' : "";
-    return '<div class="case-pair"' + (p.length === 1 ? ' style="grid-template-columns:1fr"' : "") + ">" + pair + "</div>" + warn;
+    return '<div class="case-pair">' + c.photos.slice(0, 2).map(function (ph, i) {
+      return '<button type="button" data-lb="' + idx + '" data-lb-i="' + i + '" aria-label="Увеличить фото ' + (i + 1) + ': ' + esc(c.title) + '">' +
+        '<img src="' + esc(src(ph)) + '" alt="' + esc(ph.alt || c.title) + '" loading="lazy" decoding="async"></button>';
+    }).join("") + "</div>";
+  }
+
+  function caseCard(c) {
+    var idx = cases.indexOf(c);
+    var note = isConfirmed(c) ? "" : '<span class="stage-note">Этапы лечения · ' + c.photos.length + " фото</span>";
+    return '<article class="case-card" data-reveal>' +
+      '<div class="case-media">' + caseMedia(c, idx) + "</div>" +
+      '<div class="case-info"><span class="cat">' + esc(CATEGORIES[c.category] || "") + "</span>" +
+      "<h3>" + esc(c.title) + "</h3>" + (c.text ? "<p>" + esc(c.text) + "</p>" : "") + note + "</div>" +
+      '<button type="button" class="go" data-lb="' + idx + '" data-lb-i="0" aria-label="Открыть галерею: ' + esc(c.title) + '">' + icon("i-arrow") + "</button>" +
+      "</article>";
   }
 
   function renderCases(root) {
@@ -218,39 +283,37 @@
     var list = cases.filter(function (c) { return cat === "all" || c.category === cat; });
     if (limit) list = list.slice(0, limit);
     if (!list.length) {
-      root.innerHTML = '<div class="empty-state">' + icon("i-images") +
-        "<h3>" + (cases.length ? "В этой категории пока нет случаев" : "Клинические случаи готовятся к публикации") + "</h3>" +
-        "<p>" + (cases.length
-          ? "Выберите другую категорию или вернитесь ко всем работам."
-          : "Здесь появятся реальные фотографии работ доктора Кудрявцевой — после того как доктор отберёт снимки и подтвердит порядок «до/после».") +
-        "</p></div>";
+      root.innerHTML = '<div class="cases-empty" style="grid-column:1/-1">' + icon("i-images") +
+        "<h3>" + (cases.length ? "В этой категории пока нет случаев" : "Фотографии клинических случаев скоро появятся") + "</h3>" +
+        "<p>" + (cases.length ? "Выберите другую категорию." : "Пока раздел пополняется, запишитесь на консультацию — доктор покажет примеры похожих случаев и расскажет о вариантах лечения.") + "</p>" +
+        (cases.length ? "" : '<a class="btn btn--primary" href="' + BASE + 'contacts.html#zapis">' + icon("i-calendar") + "Записаться на приём</a>") + "</div>";
       return;
     }
-    root.innerHTML = list.map(function (c) {
-      var idx = cases.indexOf(c);
-      return '<article class="case-card">' +
-        '<div class="case-media">' + caseMedia(c, idx) + "</div>" +
-        '<div class="case-info"><span class="cat">' + esc(CATEGORIES[c.category] || "") + "</span>" +
-        "<h3>" + esc(c.title) + "</h3>" + (c.text ? "<p>" + esc(c.text) + "</p>" : "") + "</div>" +
-        '<button type="button" class="link-arrow case-open" data-lb="' + idx + '" data-lb-i="0">Смотреть фото' + icon("i-arrow") + "</button>" +
-        "</article>";
-    }).join("");
+    root.innerHTML = list.map(caseCard).join("");
     $$(".ba input", root).forEach(function (r) {
       r.addEventListener("input", function () { r.parentNode.style.setProperty("--pos", r.value + "%"); });
     });
+    watchReveal(root);
   }
 
+  // Главная: блок показывается, только если есть реальные случаи
+  var homeSection = $("[data-cases-section]");
+  if (homeSection) homeSection.hidden = !cases.length;
+
   var casesRoot = $("[data-cases]");
-  if (casesRoot) {
+  if (casesRoot && (cases.length || !homeSection)) {
     var filters = $("[data-case-filters]");
-    if (filters) {
+    var note = $("[data-cases-note]");
+    if (note) note.hidden = !cases.length;
+    if (filters && cases.length) {
       var counts = { all: cases.length };
       cases.forEach(function (c) { counts[c.category] = (counts[c.category] || 0) + 1; });
-      var keys = ["all"].concat(Object.keys(CATEGORIES));
+      var keys = ["all"].concat(Object.keys(CATEGORIES).filter(function (k) { return counts[k]; }));
       filters.innerHTML = keys.map(function (k) {
         return '<button type="button" class="chip" data-cat="' + k + '" aria-pressed="' + (k === "all") + '">' +
           (k === "all" ? "Все работы" : CATEGORIES[k]) + ' <span class="count">' + (counts[k] || 0) + "</span></button>";
       }).join("");
+      filters.hidden = keys.length < 3; // фильтр нужен, если категорий больше одной
       filters.addEventListener("click", function (e) {
         var b = e.target.closest(".chip"); if (!b) return;
         $$(".chip", filters).forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
@@ -258,15 +321,25 @@
         renderCases(casesRoot);
       });
       var hash = (location.hash || "").replace("#", "");
-      if (CATEGORIES[hash]) {
-        var hb = filters.querySelector('[data-cat="' + hash + '"]');
-        if (hb) hb.click();
-      }
+      var hb = CATEGORIES[hash] && filters.querySelector('[data-cat="' + hash + '"]');
+      if (hb) { hb.setAttribute("aria-pressed", "true"); filters.querySelector('[data-cat="all"]').setAttribute("aria-pressed", "false"); casesRoot.setAttribute("data-category", hash); }
     }
     renderCases(casesRoot);
   }
 
-  /* ---------- Просмотр фото (лайтбокс) ---------- */
+  // Кнопки карусели
+  $$("[data-carousel]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var track = b.closest("section").querySelector(".is-carousel");
+      if (!track) return;
+      var card = track.querySelector(".case-card");
+      var step = card ? card.getBoundingClientRect().width + 12 : track.clientWidth * 0.8;
+      track.scrollBy({ left: b.getAttribute("data-carousel") === "next" ? step : -step, behavior: reduceMotion ? "auto" : "smooth" });
+    });
+  });
+
+  /* ---------- Галерея (лайтбокс) ---------- */
+  var lightbox = null, lbList = [], lbIndex = 0, lbTitle = "", lbReturn = null;
   function buildLightbox() {
     var el = document.createElement("div");
     el.className = "lightbox"; el.hidden = true;
@@ -279,8 +352,7 @@
     el.querySelector(".lb-prev").addEventListener("click", function () { showLb(lbIndex - 1); });
     el.querySelector(".lb-next").addEventListener("click", function () { showLb(lbIndex + 1); });
     el.addEventListener("click", function (e) { if (e.target === el || e.target.classList.contains("lightbox-stage")) closeLb(); });
-    var sx = null;
-    var stage = el.querySelector(".lightbox-stage");
+    var sx = null, stage = el.querySelector(".lightbox-stage");
     stage.addEventListener("touchstart", function (e) { sx = e.touches[0].clientX; }, { passive: true });
     stage.addEventListener("touchend", function (e) {
       if (sx === null) return;
@@ -295,13 +367,11 @@
     });
     return el;
   }
-  var lbReturn = null;
   function showLb(i) {
     if (!lbList.length) return;
     lbIndex = (i + lbList.length) % lbList.length;
-    var ph = lbList[lbIndex];
-    var img = lightbox.querySelector("img");
-    img.src = BASE + ph.src; img.alt = ph.alt || lbTitle;
+    var ph = lbList[lbIndex], img = lightbox.querySelector("img");
+    img.src = src(ph); img.alt = ph.alt || lbTitle;
     lightbox.querySelector(".lb-title").textContent = lbTitle + (ph.label ? " · " + ph.label : "");
     lightbox.querySelector(".lb-count").textContent = (lbIndex + 1) + " / " + lbList.length;
     var multi = lbList.length > 1;
@@ -316,17 +386,16 @@
     var t = e.target.closest("[data-lb]"); if (!t) return;
     var c = cases[parseInt(t.getAttribute("data-lb"), 10)]; if (!c) return;
     if (!lightbox) lightbox = buildLightbox();
-    lbReturn = t;
-    lbTitle = c.title;
+    lbReturn = t; lbTitle = c.title;
+    var conf = isConfirmed(c);
+    var bi = c.before != null ? c.before : 0, ai = c.after != null ? c.after : 1;
     lbList = c.photos.map(function (p, i) {
-      var label = c.order === "confirmed" && c.photos.length >= 2 ? (i === 0 ? "До" : i === 1 ? "После" : "") : "";
-      return { src: p.src, alt: p.alt, label: label };
+      return { src: p.src, alt: p.alt, label: conf ? (i === bi ? "До" : i === ai ? "После" : "") : "" };
     });
     lightbox.hidden = false; document.body.classList.add("menu-open");
     showLb(parseInt(t.getAttribute("data-lb-i") || "0", 10));
     lightbox.querySelector(".lb-close").focus();
   });
 
-  /* ---------- Год в подвале ---------- */
   $$("[data-year]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
 })();

@@ -21,6 +21,8 @@ export const STEPS = [
   { t: "Контроль результата и рекомендации", d: "Проверка результата, рекомендации по уходу и график контрольных визитов." },
 ];
 
+// Поле image (необязательное): путь к фото услуги, например "assets/img/services/implantaciya.webp".
+// Пока фото нет — показывается иконка.
 export const SERVICES = [
   {
     slug: "esteticheskaya-restavraciya",
@@ -201,3 +203,12 @@ export const SERVICES = [
     ],
   },
 ];
+
+// Подтверждённые сведения о квалификации. Пустые списки на сайте не показываются.
+// Формат записи: { year: "2015", text: "Название вуза, специальность" }
+export const ABOUT = {
+  education: [],
+  experience: [],
+  courses: [],
+  certificates: [],
+};

@@ -3,16 +3,15 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { SPECS, PERKS, STEPS, SERVICES } from "./content.mjs";
+import { SPECS, PERKS, STEPS, SERVICES, ABOUT } from "./content.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-// Адрес сайта после публикации (например "https://doctor-kudryavtseva.ru").
-// Пока пусто — canonical-ссылки и sitemap.xml не создаются.
-const SITE_URL = "";
+// Адрес сайта (без слеша в конце). При подключении своего домена — замените и пересоберите.
+const SITE_URL = "https://dr-kudryavceva.vercel.app";
 
 const SITE = "Доктор Кудрявцева";
-const VER = "1";
+const VER = "2";
 
 /* ---------------- Иконки ---------------- */
 const TOOTH = "M7.5 3C5 3 3.5 5 3.5 7.6c0 2.3 1 3.7 1.5 5.6.6 2.4.6 7.8 2.6 7.8 1.6 0 1.6-3.3 2.1-5 .4-1.4.9-2.3 2.3-2.3s1.9.9 2.3 2.3c.5 1.7.5 5 2.1 5 2 0 2-5.4 2.6-7.8.5-1.9 1.5-3.3 1.5-5.6C20.5 5 19 3 16.5 3c-2 0-3 1-4.5 1S9.5 3 7.5 3z";
@@ -68,37 +67,48 @@ const NAV = [
   { href: "contacts.html", label: "Контакты", key: "contacts" },
 ];
 
-function link(p, href) { return href === "index" ? (p || "./") : p + href; }
+function link(p, href) { return href === "index" ? (p === "/" ? "/" : p || "./") : p + href; }
 
-function portrait(p, { sizes = "(max-width: 860px) 88vw, 480px", eager = false, alt = "Анна Дмитриевна Кудрявцева, стоматолог, в белом медицинском халате" } = {}) {
+// Портрет — только масштабированные копии исходного фото, без ретуши.
+function portrait(p, { sizes, eager = false, alt = "Анна Дмитриевна Кудрявцева, стоматолог, в белом медицинском халате" } = {}) {
   return `<picture>
       <source type="image/webp" srcset="${p}assets/img/kudryavtseva-520.webp 520w, ${p}assets/img/kudryavtseva-860.webp 860w, ${p}assets/img/kudryavtseva-1086.webp 1086w" sizes="${sizes}">
       <img src="${p}assets/img/kudryavtseva-860.jpg" width="860" height="1147" alt="${alt}" ${eager ? 'fetchpriority="high" decoding="async"' : 'loading="lazy" decoding="async"'}>
     </picture>`;
 }
 
+const nameplate = () => `<figcaption class="nameplate">${ic("i-tooth")}<span><b>Кудрявцева<br>Анна Дмитриевна</b><small>Стоматолог</small></span></figcaption>`;
+
 function header(p, active) {
   const items = NAV.map((n) => `<li><a href="${link(p, n.href)}"${n.key === active ? ' aria-current="page"' : ""}>${n.label}</a></li>`).join("");
   const mItems = NAV.map((n) => `<li><a href="${link(p, n.href)}"${n.key === active ? ' aria-current="page"' : ""}>${n.label}${ic("i-arrow")}</a></li>`).join("");
+  const logo = `<a class="logo" href="${link(p, "index")}" aria-label="${SITE} — на главную">${ic("i-tooth")}<span class="logo-text"><span>Доктор</span><span>Кудрявцева</span></span></a>`;
   return `<a class="skip-link" href="#main">Перейти к содержанию</a>
 <header class="site-header">
   <div class="container header-inner">
-    <a class="logo" href="${link(p, "index")}" aria-label="${SITE} — на главную">${ic("i-tooth")}<span class="logo-text"><span>Доктор</span><span>Кудрявцева</span></span></a>
+    ${logo}
     <nav class="main-nav" aria-label="Основное меню"><ul>${items}</ul></nav>
     <a class="header-phone" data-cfg="phone" href="#" hidden>${ic("i-phone")}<span data-cfg-text></span></a>
     <a class="btn btn--primary btn--sm header-cta" href="${p}contacts.html#zapis">Записаться на приём</a>
-    <button class="burger" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu">${ic("i-menu")}</button>
+    <div class="header-actions">
+      <a class="round-btn round-btn--gold" data-contact-btn href="${p}contacts.html#zapis" aria-label="Записаться на приём">${ic("i-calendar")}</a>
+      <button class="round-btn burger" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu">${ic("i-menu")}</button>
+    </div>
   </div>
 </header>
-<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Меню">
   <div class="mobile-menu-top">
-    <a class="logo" href="${link(p, "index")}">${ic("i-tooth")}<span class="logo-text"><span>Доктор</span><span>Кудрявцева</span></span></a>
-    <button class="burger" style="display:inline-flex" type="button" aria-label="Закрыть меню" data-menu-close>${ic("i-close")}</button>
+    ${logo}
+    <button class="round-btn" type="button" aria-label="Закрыть меню" data-menu-close>${ic("i-close")}</button>
   </div>
   <nav aria-label="Мобильное меню"><ul>${mItems}</ul></nav>
   <div class="mobile-menu-foot">
-    <a class="btn btn--ghost" data-cfg="phone" href="#" hidden>${ic("i-phone")}<span data-cfg-text></span></a>
     <a class="btn btn--primary" href="${p}contacts.html#zapis">${ic("i-calendar")}Записаться на приём</a>
+    <a class="btn btn--ghost" data-cfg="phone" href="#" hidden>${ic("i-phone")}<span data-cfg-text></span></a>
+    <div class="messengers">
+      <a class="btn btn--ghost" data-cfg="telegram" href="#" hidden>${ic("i-send")}Telegram</a>
+      <a class="btn btn--ghost" data-cfg="whatsapp" href="#" hidden>${ic("i-chat")}WhatsApp</a>
+    </div>
   </div>
 </div>`;
 }
@@ -106,80 +116,77 @@ function header(p, active) {
 function footer(p) {
   return `<footer class="site-footer">
   <div class="container">
-    <div class="footer-grid">
-      <div class="footer-col">
-        <a class="logo" href="${link(p, "index")}">${ic("i-tooth")}<span class="logo-text"><span>Доктор</span><span>Кудрявцева</span></span></a>
-        <p class="muted">Анна Дмитриевна Кудрявцева — стоматолог-эндодонтист-микроскопист, ортопед, хирург-имплантолог.</p>
-        <ul>
-          <li><a data-cfg="phone" href="#" hidden><span data-cfg-text></span></a></li>
-          <li><a data-cfg="telegram" href="#" hidden>Telegram</a></li>
-          <li><a data-cfg="whatsapp" href="#" hidden>WhatsApp</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h2>Разделы</h2>
-        <ul>${NAV.map((n) => `<li><a href="${link(p, n.href)}">${n.label}</a></li>`).join("")}</ul>
-      </div>
-      <div class="footer-col">
-        <h2>Услуги</h2>
-        <ul>${SERVICES.map((s) => `<li><a href="${p}services/${s.slug}.html">${s.title}</a></li>`).join("")}</ul>
+    <div class="footer-top">
+      <a class="logo" href="${link(p, "index")}">${ic("i-tooth")}<span class="logo-text"><span>Доктор</span><span>Кудрявцева</span></span></a>
+      <nav class="footer-nav" aria-label="Разделы сайта"><ul>${NAV.map((n) => `<li><a href="${link(p, n.href)}">${n.label}</a></li>`).join("")}</ul></nav>
+      <div class="footer-contacts">
+        <a data-cfg="phone" href="#" hidden>${ic("i-phone")}<span data-cfg-text></span></a>
+        <a data-cfg="mapUrl" data-cfg-keep-text href="#" hidden>${ic("i-pin")}<span data-cfg-from="address">На карте</span></a>
+        <a class="circle-link" data-cfg="telegram" href="#" hidden aria-label="Telegram">${ic("i-send")}</a>
+        <a class="circle-link" data-cfg="whatsapp" href="#" hidden aria-label="WhatsApp">${ic("i-chat")}</a>
       </div>
     </div>
+    <div class="footer-services">${SERVICES.map((s) => `<a href="${p}services/${s.slug}.html">${s.title}</a>`).join("")}</div>
     <div class="footer-bottom">
-      <span>© <span data-year>2026</span> ${SITE}. <a href="${p}privacy.html">Политика обработки персональных данных</a></span>
+      <div class="footer-legal">
+        <span>© <span data-year>2026</span> ${SITE}. <a href="${p}privacy.html">Политика конфиденциальности</a> · <a href="${p}consent.html">Согласие на обработку данных</a></span>
+        <span data-cfg="license" data-cfg-mode="text" hidden></span>
+      </div>
       <span>Имеются противопоказания. Необходима консультация специалиста.</span>
     </div>
   </div>
 </footer>
 <div class="mobile-cta">
-  <a class="btn btn--ghost" data-cfg="phone" href="#" hidden aria-label="Позвонить">${ic("i-phone")}Позвонить</a>
+  <a class="btn btn--ghost" data-cfg="phone" data-cfg-keep-text href="#" hidden aria-label="Позвонить">${ic("i-phone")}Позвонить</a>
   <a class="btn btn--primary" href="${p}contacts.html#zapis">${ic("i-calendar")}Записаться</a>
 </div>`;
 }
 
 function serviceOptions(selected = "") {
-  return `<option value="">Выберите направление</option>
+  return `<option value="">Выберите услугу</option>
       <option value="konsultaciya"${selected === "konsultaciya" ? " selected" : ""}>Консультация и диагностика</option>
       ${SERVICES.map((s) => `<option value="${s.slug}"${s.slug === selected ? " selected" : ""}>${s.title}</option>`).join("")}
-      <option value="ne-znayu">Не знаю, нужна консультация</option>`;
+      <option value="ne-znayu">Не знаю, нужна консультация врача</option>`;
 }
 
 function bookingForm(p, id, { dark = false, selected = "", comment = false } = {}) {
-  return `<form class="form${dark ? " form--dark" : ""}" data-booking novalidate>
-    <div class="form-row">
-      <div class="field">
+  const name = `<div class="field">
         <label for="${id}-name">Ваше имя</label>
-        <div class="input-wrap">${ic("i-user")}<input id="${id}-name" name="name" type="text" autocomplete="name" placeholder="Как к вам обращаться" required></div>
+        <div class="input-wrap">${ic("i-user")}<input id="${id}-name" name="name" type="text" autocomplete="name" placeholder="Как к вам обращаться" maxlength="80" required></div>
         <span class="field-error" aria-live="polite"></span>
-      </div>
-      <div class="field">
+      </div>`;
+  const phone = `<div class="field">
         <label for="${id}-phone">Телефон</label>
         <div class="input-wrap">${ic("i-phone")}<input id="${id}-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" required></div>
         <span class="field-error" aria-live="polite"></span>
-      </div>
-    </div>
-    <div class="field">
-      <label for="${id}-service">Услуга</label>
-      <div class="input-wrap">${ic("i-tooth")}<select id="${id}-service" name="service">${serviceOptions(selected)}</select></div>
-    </div>
+      </div>`;
+  const service = `<div class="field">
+        <label for="${id}-service">Услуга</label>
+        <div class="input-wrap">${ic("i-tooth")}<select id="${id}-service" name="service" required>${serviceOptions(selected)}</select></div>
+        <span class="field-error" aria-live="polite"></span>
+      </div>`;
+  return `<form class="form${dark ? " form--dark" : ""}" data-booking novalidate>
+    ${comment ? `<div class="form-grid form-grid--2">${name}${phone}</div>${service}` : `<div class="form-grid">${name}${phone}${service}</div>`}
     ${comment ? `<div class="field">
       <label for="${id}-comment">Комментарий <span class="muted">(необязательно)</span></label>
-      <textarea id="${id}-comment" name="comment" rows="3" placeholder="Что беспокоит, удобное время для звонка"></textarea>
+      <textarea id="${id}-comment" name="comment" rows="3" maxlength="1000" placeholder="Что беспокоит, удобное время для звонка"></textarea>
     </div>` : ""}
-    <label class="check"><input id="${id}-consent" type="checkbox" name="consent" required><span>Согласен(а) на <a href="${p}privacy.html">обработку персональных данных</a><span class="field-error"></span></span></label>
-    <div><button class="btn btn--primary" type="submit">Записаться ${ic("i-arrow")}</button></div>
-    <p class="form-status" role="status" hidden></p>
+    <div class="hp" aria-hidden="true"><label for="${id}-website">Не заполняйте это поле</label><input id="${id}-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+    <div class="form-foot">
+      <label class="check"><input id="${id}-consent" type="checkbox" name="consent" required><span>Даю <a href="${p}consent.html">согласие на обработку персональных данных</a> и принимаю <a href="${p}privacy.html">политику конфиденциальности</a><span class="field-error" aria-live="polite"></span></span></label>
+      <button class="btn btn--primary" type="submit">Записаться ${ic("i-arrow")}</button>
+    </div>
+    <p class="form-status" role="status" aria-live="polite" hidden></p>
   </form>`;
 }
 
 function bookingBand(p, id, selected = "") {
-  return `<section class="booking" aria-labelledby="${id}-title">
+  return `<section class="booking" id="${id}-booking" aria-labelledby="${id}-title">
   <div class="container">
     <div class="booking-card" data-reveal>
       <div class="booking-intro">
-        <span class="eyebrow" style="color:var(--gold-light)">Запись</span>
         <h2 id="${id}-title">Запишитесь на приём</h2>
-        <p>Оставьте имя и телефон — с вами свяжутся, чтобы подобрать удобное время консультации.</p>
+        <p>Получите консультацию и индивидуальный план лечения. Оставьте контакты — вам перезвонят, чтобы подобрать время визита.</p>
       </div>
       ${bookingForm(p, id, { dark: true, selected })}
     </div>
@@ -187,16 +194,21 @@ function bookingBand(p, id, selected = "") {
 </section>`;
 }
 
-function serviceCard(p, s) {
+function serviceArt(p, s) {
+  return `<span class="service-art">${s.image ? `<img src="${p}${s.image}" alt="" loading="lazy" decoding="async">` : ic(s.icon)}</span>`;
+}
+
+function serviceCard(p, s, withText = false) {
   return `<a class="service-card" href="${p}services/${s.slug}.html">
-      <span class="service-art">${ic(s.icon)}</span>
-      <span class="service-body"><h3>${s.title}</h3><p>${s.short}</p></span>
-      <span class="go">${ic("i-arrow")}</span>
+      ${serviceArt(p, s)}
+      <span class="service-body"><h3>${s.title}</h3>${withText ? `<p>${s.short}</p>` : ""}</span>
+      <span class="go" aria-hidden="true">${ic("i-arrow")}</span>
     </a>`;
 }
 
-function stepsList() {
-  return `<ol class="steps">${STEPS.map((s, i) => `<li class="step" data-reveal><span class="step-num">0${i + 1}</span><h3>${s.t}</h3><p>${s.d}</p></li>`).join("")}</ol>`;
+function stepsList(compact = false) {
+  return `<ol class="steps${compact ? " steps--compact" : ""}">${STEPS.map((s, i) =>
+    `<li class="step"><span class="step-num">0${i + 1}</span><div><h3>${s.t}</h3>${compact ? "" : `<p>${s.d}</p>`}</div></li>`).join("")}</ol>`;
 }
 
 function crumbs(p, items) {
@@ -205,15 +217,19 @@ function crumbs(p, items) {
     i === all.length - 1 ? `<li aria-current="page">${c.label}</li>` : `<li><a href="${c.href}">${c.label}</a></li>`).join("")}</ol></nav>`;
 }
 
-function todo(text) { return `<div class="todo">${ic("i-pen")}<span>${text}</span></div>`; }
+function crumbsLd(items) {
+  return `<script type="application/ld+json">${JSON.stringify({
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    itemListElement: [{ name: "Главная", path: "" }, ...items].map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: `${SITE_URL}/${c.path}` })),
+  })}</script>`;
+}
 
 /* ---------------- Обёртка страницы ---------------- */
-function page({ path, title, description, active, body, jsonld = "", cases = false }) {
+function page({ path, title, description, active, body, jsonld = "", cases = false, abs = false, noindex = false }) {
   const depth = path.split("/").length - 1;
-  const p = depth ? "../".repeat(depth) : "";
-  const fullTitle = title === SITE ? `${SITE} — стоматолог-эндодонтист, ортопед, имплантолог` : `${title} — ${SITE}`;
-  const canon = SITE_URL ? `<link rel="canonical" href="${SITE_URL}/${path === "index.html" ? "" : path}">` : "";
-  const ogImg = SITE_URL ? `<meta property="og:image" content="${SITE_URL}/assets/img/kudryavtseva-860.jpg">` : "";
+  const p = abs ? "/" : depth ? "../".repeat(depth) : "";
+  const fullTitle = title === SITE ? `${SITE} — стоматолог-эндодонтист, ортопед, хирург-имплантолог` : `${title} — ${SITE}`;
+  const url = `${SITE_URL}/${path === "index.html" ? "" : path}`;
   return `<!doctype html>
 <html lang="ru">
 <head>
@@ -222,19 +238,22 @@ function page({ path, title, description, active, body, jsonld = "", cases = fal
 <title>${fullTitle}</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="${description}">
-<meta name="theme-color" content="#fbf7f1">
-${canon}
+${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" href="${url}">`}
+<meta name="theme-color" content="#fbf7f2">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ru_RU">
 <meta property="og:site_name" content="${SITE}">
 <meta property="og:title" content="${fullTitle}">
 <meta property="og:description" content="${description}">
-${ogImg}
+<meta property="og:url" content="${url}">
+<meta property="og:image" content="${SITE_URL}/assets/img/kudryavtseva-860.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="${FAVICON}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="${p}assets/css/style.css?v=${VER}">
+${path === "index.html" ? `<link rel="preload" as="image" type="image/webp" imagesrcset="${p}assets/img/kudryavtseva-520.webp 520w, ${p}assets/img/kudryavtseva-860.webp 860w, ${p}assets/img/kudryavtseva-1086.webp 1086w" imagesizes="(max-width: 760px) 92vw, 42vw">` : ""}
 ${jsonld}
 </head>
 <body data-base="${p}">
@@ -260,83 +279,89 @@ pages.push({
   title: SITE,
   active: "home",
   cases: true,
-  description: "Анна Дмитриевна Кудрявцева — стоматолог-эндодонтист-микроскопист, ортопед, хирург-имплантолог. Лечение под микроскопом, эстетическая реставрация, протезирование, имплантация. Запись на приём.",
+  description: "Анна Дмитриевна Кудрявцева — стоматолог-эндодонтист-микроскопист, ортопед, хирург-имплантолог. Лечение под микроскопом, эстетическая реставрация, протезирование, имплантация. Онлайн-запись на приём.",
   jsonld: `<script type="application/ld+json">${JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Dentist",
     name: SITE,
+    url: SITE_URL,
+    image: SITE_URL + "/assets/img/kudryavtseva-860.jpg",
     description: "Стоматологическая практика Анны Дмитриевны Кудрявцевой: эндодонтия под микроскопом, эстетическая реставрация, протезирование, имплантация.",
-    ...(SITE_URL ? { url: SITE_URL, image: SITE_URL + "/assets/img/kudryavtseva-860.jpg" } : {}),
     employee: { "@type": "Person", name: "Анна Дмитриевна Кудрявцева", jobTitle: "Стоматолог" },
-    availableService: SERVICES.map((s) => ({ "@type": "MedicalProcedure", name: s.title })),
+    availableService: SERVICES.map((s) => ({ "@type": "MedicalProcedure", name: s.title, url: `${SITE_URL}/services/${s.slug}.html` })),
   })}</script>`,
   body: (p) => `
 <section class="hero" aria-labelledby="hero-title">
-  <div class="container hero-grid">
+  <span class="hero-arc" aria-hidden="true"></span>
+  <div class="container hero-inner">
     <div class="hero-copy hero-anim">
-      <span class="eyebrow eyebrow--plain">Современная стоматология с заботой о вашем здоровье</span>
-      <h1 id="hero-title"><span>Доктор</span> <em>Кудрявцева</em></h1>
+      <span class="eyebrow eyebrow--plain">Современная стоматология<br>с заботой о вашем здоровье</span>
+      <h1 id="hero-title"><span>Доктор</span> <span>Кудрявцева</span></h1>
       <ul class="specs">${SPECS.map((s) => `<li>${s}</li>`).join("")}</ul>
-      <p class="lead">Лечение корневых каналов под микроскопом, эстетическая реставрация, протезирование и имплантация — с бережным отношением к собственным зубам.</p>
       <div class="btn-row">
-        <a class="btn btn--primary" href="${p}contacts.html#zapis">${ic("i-calendar")}Записаться на приём${ic("i-arrow")}</a>
+        <a class="btn btn--primary" href="${p}contacts.html#zapis">${ic("i-calendar")}Записаться на приём</a>
         <a class="btn btn--ghost" href="${p}services.html">Все услуги</a>
       </div>
     </div>
-    <figure class="hero-figure" style="margin:0">
-      <div class="arch">${portrait(p, { eager: true })}</div>
-      <figcaption class="nameplate">${ic("i-tooth")}<span><b>Кудрявцева Анна Дмитриевна</b><small>Стоматолог</small></span></figcaption>
+    <figure class="hero-photo">
+      ${portrait(p, { eager: true, sizes: "(max-width: 760px) 92vw, 42vw" })}
+      ${nameplate()}
     </figure>
   </div>
 </section>
 
-<section class="section--tight" style="padding-top:0" aria-label="Преимущества">
+<div class="perks-wrap">
   <div class="container">
-    <ul class="perks" style="list-style:none;margin:0;padding:0">${PERKS.map((x) => `<li class="perk">${ic(x.icon)}<span>${x.text}</span></li>`).join("")}</ul>
+    <ul class="perks" aria-label="Преимущества">${PERKS.map((x) => `<li class="perk">${ic(x.icon)}<span>${x.text}</span></li>`).join("")}</ul>
   </div>
-</section>
+</div>
 
-<section class="section" style="padding-top:clamp(24px,3vw,40px)" aria-labelledby="services-title">
+<section class="section" aria-labelledby="services-title">
   <div class="container">
     <div class="section-head">
       <div><span class="eyebrow">Услуги</span><h2 id="services-title">Направления лечения</h2></div>
-      <a class="link-arrow" href="${p}services.html">Смотреть все услуги${ic("i-arrow")}</a>
+      <a class="link-arrow" href="${p}services.html"><span>Смотреть все услуги</span>${ic("i-arrow")}</a>
     </div>
     <div class="services-grid" data-reveal>${SERVICES.map((s) => serviceCard(p, s)).join("")}</div>
   </div>
 </section>
 
-<section class="about-band section" aria-labelledby="about-title">
+<section class="about-band" aria-labelledby="about-title">
   <div class="container about-grid">
-    <div class="about-photo" data-reveal>${portrait(p, { sizes: "(max-width: 760px) 340px, 360px" })}</div>
+    <figure class="about-photo">${portrait(p, { sizes: "(max-width: 760px) 100vw, 400px" })}</figure>
     <div class="about-copy" data-reveal>
       <span class="eyebrow">О докторе</span>
       <h2 id="about-title">Кудрявцева <span>Анна Дмитриевна</span></h2>
       <p class="lead">Стоматолог, специализирующийся на сложном лечении корневых каналов под микроскопом, эстетической реставрации и восстановлении зубов.</p>
       <div class="facts">
-        <span class="fact">${ic("i-microscope")}Эндодонтия под микроскопом</span>
-        <span class="fact">${ic("i-crown")}Ортопедия</span>
-        <span class="fact">${ic("i-implant")}Хирургия и имплантология</span>
+        <span class="fact">${ic("i-microscope")}Лечение под микроскопом</span>
+        <span class="fact">${ic("i-sparkle-tooth")}Эстетическая реставрация</span>
+        <span class="fact">${ic("i-tooth")}Комплексный подход</span>
       </div>
       <div><a class="btn btn--ghost" href="${p}about.html">Подробнее о докторе${ic("i-arrow")}</a></div>
     </div>
+    <div class="about-deco" aria-hidden="true"><span class="ring">${ic("i-microscope")}</span></div>
   </div>
 </section>
 
-<section class="section" aria-labelledby="cases-title">
+<section class="section" aria-labelledby="cases-title" data-cases-section hidden>
   <div class="container">
     <div class="section-head">
       <div><span class="eyebrow">Примеры работ</span><h2 id="cases-title">Примеры лечения</h2></div>
-      <a class="link-arrow" href="${p}cases.html">Смотреть все работы${ic("i-arrow")}</a>
+      <div class="carousel-nav" aria-label="Листать примеры">
+        <button type="button" data-carousel="prev" aria-label="Предыдущий случай">${ic("i-chev-left")}</button>
+        <button type="button" data-carousel="next" aria-label="Следующий случай">${ic("i-chev-right")}</button>
+      </div>
+      <a class="link-arrow" href="${p}cases.html"><span>Смотреть все работы</span>${ic("i-arrow")}</a>
     </div>
-    <div class="cases-grid" data-cases data-limit="3"></div>
+    <div class="cases-grid is-carousel" data-cases data-limit="6"></div>
   </div>
 </section>
 
 <section class="section section--ivory" aria-labelledby="steps-title">
   <div class="container">
     <div class="section-head"><div><span class="eyebrow">Этапы лечения</span><h2 id="steps-title">Как проходит лечение</h2></div></div>
-    ${stepsList()}
+    ${stepsList(true)}
   </div>
 </section>
 
@@ -350,6 +375,7 @@ pages.push({
   title: "Услуги",
   active: "services",
   description: "Услуги доктора Кудрявцевой: эстетическая реставрация, перелечивание каналов под микроскопом, протезирование, имплантация, костная пластика, удаление зубов мудрости.",
+  jsonld: crumbsLd([{ name: "Услуги", path: "services.html" }]),
   body: (p) => `
 <section class="page-hero">
   <div class="container hero-anim">
@@ -359,14 +385,14 @@ pages.push({
     <p class="lead">Терапия и эндодонтия под микроскопом, ортопедия, хирургия и имплантология. Выберите направление, чтобы узнать, как проходит лечение.</p>
   </div>
 </section>
-<section class="section" style="padding-top:0">
+<section class="section section--flush-top">
   <div class="container service-rows">
     ${SERVICES.map((s) => `<a class="service-row" href="${p}services/${s.slug}.html" data-reveal>
-      <span class="service-art">${ic(s.icon)}</span>
+      ${serviceArt(p, s)}
       <span class="service-row-body">
         <span class="eyebrow eyebrow--plain">${s.spec}</span>
         <h2>${s.title}</h2>
-        <span class="muted">${s.lead}</span>
+        <span class="muted">${s.short}</span>
         <ul class="tags">${s.tags.map((t) => `<li>${t}</li>`).join("")}</ul>
       </span>
       <span class="btn btn--ghost btn--sm">Подробнее${ic("i-arrow")}</span>
@@ -391,8 +417,8 @@ for (const s of SERVICES) {
     active: "services",
     description: s.seo,
     jsonld: `<script type="application/ld+json">${JSON.stringify({
-      "@context": "https://schema.org", "@type": "MedicalProcedure", name: s.title, description: s.lead,
-    })}</script>`,
+      "@context": "https://schema.org", "@type": "MedicalProcedure", name: s.title, description: s.lead, url: `${SITE_URL}/services/${s.slug}.html`,
+    })}</script>${crumbsLd([{ name: "Услуги", path: "services.html" }, { name: s.title, path: `services/${s.slug}.html` }])}`,
     body: (p) => `
 <section class="page-hero">
   <div class="container detail-hero">
@@ -402,14 +428,14 @@ for (const s of SERVICES) {
       <h1>${s.title}</h1>
       <p class="lead">${s.lead}</p>
       <div class="btn-row">
-        <a class="btn btn--primary" href="#zapis-usluga">${ic("i-calendar")}Записаться на приём</a>
+        <a class="btn btn--primary" href="#svc-booking">${ic("i-calendar")}Записаться на приём</a>
         <a class="btn btn--ghost" href="${p}cases.html#${s.cat}">Примеры работ</a>
       </div>
     </div>
-    <span class="service-art" aria-hidden="true">${ic(s.icon)}</span>
+    ${serviceArt(p, s).replace('class="service-art"', 'class="service-art" aria-hidden="true"')}
   </div>
 </section>
-<section class="section" style="padding-top:0">
+<section class="section section--flush-top">
   <div class="container detail-layout">
     <div class="detail-main">
       <div class="detail-block" data-reveal>
@@ -424,40 +450,44 @@ for (const s of SERVICES) {
         <h3>Что важно знать</h3>
         <ul>${s.notes.map((n) => `<li>${n}</li>`).join("")}</ul>
       </div>
-      <div class="detail-block" data-reveal>
-        <h2>Стоимость</h2>
-        ${todo("<b>Раздел для заполнения.</b> Цены будут добавлены после согласования с доктором. Точный объём лечения определяется на консультации.")}
-      </div>
     </div>
     <aside class="aside-card" aria-label="Запись и другие услуги">
       <h3>Нужна консультация?</h3>
       <p class="muted">Врач осмотрит, при необходимости назначит снимки и объяснит варианты лечения.</p>
-      <a class="btn btn--primary" href="#zapis-usluga">Записаться${ic("i-arrow")}</a>
+      <a class="btn btn--primary" href="#svc-booking">Записаться${ic("i-arrow")}</a>
       <span class="eyebrow eyebrow--plain" style="margin-top:8px">Другие услуги</span>
       <ul class="aside-nav">${SERVICES.filter((o) => o.slug !== s.slug).map((o) => `<li><a href="${p}services/${o.slug}.html">${o.title}${ic("i-arrow")}</a></li>`).join("")}</ul>
     </aside>
   </div>
 </section>
-<div id="zapis-usluga">${bookingBand(p, "svc", s.slug)}</div>
+${bookingBand(p, "svc", s.slug)}
 `,
   });
 }
 
 /* ---------------- О докторе ---------------- */
+const QUAL = [
+  ["education", "Образование", "i-cap"],
+  ["experience", "Опыт работы", "i-briefcase"],
+  ["courses", "Повышение квалификации", "i-doc"],
+  ["certificates", "Сертификаты и аккредитация", "i-award"],
+].filter(([k]) => ABOUT[k] && ABOUT[k].length);
+
 pages.push({
   path: "about.html",
   title: "О докторе",
   active: "about",
-  description: "Анна Дмитриевна Кудрявцева — стоматолог-эндодонтист-микроскопист, ортопед, хирург-имплантолог. Лечение зубов под микроскопом.",
+  description: "Анна Дмитриевна Кудрявцева — стоматолог-эндодонтист-микроскопист, ортопед, хирург-имплантолог. Лечение под микроскопом, эстетическая реставрация, комплексный подход.",
   jsonld: `<script type="application/ld+json">${JSON.stringify({
-    "@context": "https://schema.org", "@type": "Person", name: "Анна Дмитриевна Кудрявцева", jobTitle: "Стоматолог", knowsAbout: SPECS,
-  })}</script>`,
+    "@context": "https://schema.org", "@type": "Person", name: "Анна Дмитриевна Кудрявцева", jobTitle: "Стоматолог",
+    image: SITE_URL + "/assets/img/kudryavtseva-860.jpg", url: `${SITE_URL}/about.html`, knowsAbout: SPECS,
+  })}</script>${crumbsLd([{ name: "О докторе", path: "about.html" }])}`,
   body: (p) => `
 <section class="page-hero">
   <div class="container about-hero">
-    <figure class="hero-figure" style="margin:0">
-      <div class="arch">${portrait(p, { eager: true, sizes: "(max-width: 860px) 86vw, 420px" })}</div>
-      <figcaption class="nameplate">${ic("i-tooth")}<span><b>Кудрявцева Анна Дмитриевна</b><small>Стоматолог</small></span></figcaption>
+    <figure class="portrait-frame">
+      <div class="frame">${portrait(p, { eager: true, sizes: "(max-width: 760px) 84vw, 440px" })}</div>
+      ${nameplate()}
     </figure>
     <div class="detail-copy hero-anim">
       ${crumbs(p, [{ label: "О докторе" }])}
@@ -465,40 +495,31 @@ pages.push({
       <h1>Кудрявцева Анна Дмитриевна</h1>
       <ul class="specs">${SPECS.map((s) => `<li>${s}</li>`).join("")}</ul>
       <p class="lead">Специализируется на сложном лечении корневых каналов под микроскопом, эстетической реставрации и восстановлении зубов.</p>
-      <div class="btn-row"><a class="btn btn--primary" href="${p}contacts.html#zapis">${ic("i-calendar")}Записаться на приём</a></div>
+      <div class="btn-row">
+        <a class="btn btn--primary" href="${p}contacts.html#zapis">${ic("i-calendar")}Записаться на приём</a>
+        <a class="btn btn--ghost" href="${p}services.html">Все услуги</a>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="section section--ivory">
   <div class="container">
-    <div class="section-head"><div><span class="eyebrow">Специализации</span><h2>Три направления в одних руках</h2><p class="lead">Когда терапевтический, ортопедический и хирургический этапы ведёт один врач, план лечения остаётся цельным.</p></div></div>
-    <div class="two-col" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))">
-      <div class="panel" data-reveal><h3>${ic("i-microscope")}Эндодонтия</h3><p class="muted">Лечение и перелечивание корневых каналов под микроскопом, эстетическая реставрация зубов.</p><a class="link-arrow" href="${p}services/slozhnoe-perelechivanie.html">Перелечивание каналов${ic("i-arrow")}</a></div>
-      <div class="panel" data-reveal><h3>${ic("i-crown")}Ортопедия</h3><p class="muted">Восстановление разрушенных и отсутствующих зубов: вкладки, коронки, виниры, конструкции на имплантатах.</p><a class="link-arrow" href="${p}services/protezirovanie.html">Протезирование${ic("i-arrow")}</a></div>
-      <div class="panel" data-reveal><h3>${ic("i-implant")}Хирургия и имплантология</h3><p class="muted">Имплантация, костная пластика, удаление зубов мудрости.</p><a class="link-arrow" href="${p}services/implantaciya.html">Имплантация${ic("i-arrow")}</a></div>
+    <div class="section-head"><div><span class="eyebrow">Направления</span><h2>Три специализации</h2><p class="lead">Терапевтический, ортопедический и хирургический этапы лечения ведёт один врач.</p></div></div>
+    <div class="cards-3">
+      <div class="panel" data-reveal><h3>${ic("i-microscope")}Эндодонтия под микроскопом</h3><p>Лечение и перелечивание корневых каналов с увеличением, когда важна каждая деталь анатомии зуба.</p><a class="link-arrow" href="${p}services/slozhnoe-perelechivanie.html"><span>Перелечивание каналов</span>${ic("i-arrow")}</a></div>
+      <div class="panel" data-reveal><h3>${ic("i-crown")}Ортопедия</h3><p>Восстановление разрушенных и отсутствующих зубов: вкладки, коронки, виниры, конструкции на имплантатах.</p><a class="link-arrow" href="${p}services/protezirovanie.html"><span>Протезирование</span>${ic("i-arrow")}</a></div>
+      <div class="panel" data-reveal><h3>${ic("i-implant")}Хирургия и имплантология</h3><p>Имплантация, костная пластика и удаление зубов мудрости.</p><a class="link-arrow" href="${p}services/implantaciya.html"><span>Имплантация</span>${ic("i-arrow")}</a></div>
     </div>
   </div>
 </section>
 
-<section class="section">
-  <div class="container">
-    <div class="section-head"><div><span class="eyebrow">Квалификация</span><h2>Образование и опыт</h2></div></div>
-    <div class="two-col">
-      <div class="panel" data-reveal><h3>${ic("i-cap")}Образование</h3>${todo("<b>Для заполнения:</b> учебное заведение, специальность, год окончания; ординатура/интернатура.")}</div>
-      <div class="panel" data-reveal><h3>${ic("i-briefcase")}Опыт работы</h3>${todo("<b>Для заполнения:</b> стаж и места работы — после подтверждения доктором.")}</div>
-      <div class="panel" data-reveal><h3>${ic("i-doc")}Повышение квалификации</h3>${todo("<b>Для заполнения:</b> курсы, обучение и даты прохождения.")}</div>
-      <div class="panel" data-reveal><h3>${ic("i-award")}Сертификаты и аккредитация</h3>${todo("<b>Для заполнения:</b> сведения о действующих сертификатах/аккредитации специалиста.")}</div>
-    </div>
-  </div>
-</section>
-
-<section class="section section--ivory" aria-labelledby="micro-title">
+<section class="section" aria-labelledby="micro-title">
   <div class="container micro">
     <div class="detail-block" data-reveal>
       <span class="eyebrow">Технологии</span>
       <h2 id="micro-title">Лечение под микроскопом</h2>
-      <p class="lead">Дентальный микроскоп даёт многократное увеличение и яркий свет прямо по оси зрения врача. Детали, которые не видны невооружённым глазом, становятся различимы.</p>
+      <p class="lead">Дентальный микроскоп даёт многократное увеличение и яркий свет по оси зрения врача. Детали, которые не видны невооружённым глазом, становятся различимы.</p>
       <ul class="micro-list">
         <li><span class="icon-wrap">${ic("i-eye")}</span><span><b>Видно больше</b><span>Можно найти дополнительные и узкие каналы, трещины, края старых пломб.</span></span></li>
         <li><span class="icon-wrap">${ic("i-sun")}</span><span><b>Свет без теней</b><span>Освещение направлено туда же, куда смотрит врач, — даже в глубине канала.</span></span></li>
@@ -509,6 +530,26 @@ pages.push({
     <div class="micro-visual" aria-hidden="true">${ic("i-microscope")}</div>
   </div>
 </section>
+
+<section class="section section--ivory">
+  <div class="container">
+    <div class="section-head"><div><span class="eyebrow">Подход</span><h2>Реставрация и комплексное лечение</h2></div></div>
+    <div class="cards-3">
+      <div class="panel" data-reveal><h3>${ic("i-sparkle-tooth")}Эстетическая реставрация</h3><p>Форма и цвет зуба восстанавливаются послойно, чтобы реставрация не отличалась от собственной эмали.</p><a class="link-arrow" href="${p}services/esteticheskaya-restavraciya.html"><span>Подробнее</span>${ic("i-arrow")}</a></div>
+      <div class="panel" data-reveal><h3>${ic("i-shield")}Сохранение своих зубов</h3><p>Перед удалением врач оценивает, можно ли сохранить зуб с помощью лечения каналов и восстановления.</p></div>
+      <div class="panel" data-reveal><h3>${ic("i-tooth")}Единый план</h3><p>Лечение, протезирование и хирургия планируются вместе, с учётом конечного результата.</p></div>
+    </div>
+  </div>
+</section>
+
+${QUAL.length ? `<section class="section">
+  <div class="container">
+    <div class="section-head"><div><span class="eyebrow">Квалификация</span><h2>Образование и опыт</h2></div></div>
+    <div class="cards-3" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))">
+      ${QUAL.map(([k, t, i]) => `<div class="panel" data-reveal><h3>${ic(i)}${t}</h3><ul class="qual-list">${ABOUT[k].map((r) => `<li>${r.year ? `<span class="y">${r.year}</span>` : "<span></span>"}<span>${r.text}</span></li>`).join("")}</ul></div>`).join("")}
+    </div>
+  </div>
+</section>` : ""}
 
 <section class="section">
   <div class="container">
@@ -526,21 +567,22 @@ pages.push({
   title: "Примеры работ",
   active: "cases",
   cases: true,
-  description: "Примеры работ доктора Кудрявцевой: реальные клинические случаи «до и после» — реставрация, перелечивание каналов, протезирование, имплантация.",
+  description: "Примеры работ доктора Кудрявцевой: реальные клинические случаи — реставрация, перелечивание каналов, протезирование, имплантация.",
+  jsonld: crumbsLd([{ name: "Примеры работ", path: "cases.html" }]),
   body: (p) => `
 <section class="page-hero">
   <div class="container hero-anim">
     ${crumbs(p, [{ label: "Примеры работ" }])}
-    <span class="eyebrow">До / После</span>
+    <span class="eyebrow">Клинические случаи</span>
     <h1>Примеры работ</h1>
-    <p class="lead">Реальные клинические случаи из практики доктора. Фотографии публикуются без ретуши результата.</p>
+    <p class="lead">Реальные случаи из практики доктора. Фотографии публикуются без ретуши и изменения результата лечения.</p>
   </div>
 </section>
-<section class="section" style="padding-top:0">
+<section class="section section--flush-top">
   <div class="container">
-    <div class="filters" data-case-filters role="group" aria-label="Категории работ"></div>
+    <div class="filters" data-case-filters role="group" aria-label="Категории работ" hidden></div>
     <div class="cases-grid" data-cases data-category="all" aria-live="polite"></div>
-    <p class="muted" style="margin-top:24px;font-size:.84rem;display:flex;gap:10px;align-items:flex-start">${ic("i-info")}<span>Подписи «До» и «После» ставятся только после подтверждения доктором. Для случаев, где порядок не подтверждён, фото показываются без этих подписей. Результат лечения индивидуален.</span></p>
+    <p class="muted" data-cases-note hidden style="margin-top:24px;font-size:.88rem;display:flex;gap:10px;align-items:flex-start">${ic("i-info")}<span>Подписи «До» и «После» ставятся только для случаев, порядок снимков в которых подтверждён доктором. Результат лечения индивидуален.</span></p>
   </div>
 </section>
 ${bookingBand(p, "cases")}
@@ -548,32 +590,43 @@ ${bookingBand(p, "cases")}
 });
 
 /* ---------------- Контакты ---------------- */
-const contactItem = (icon, label, key, fallback) =>
-  `<div class="contact-item"><span class="icon-wrap">${ic(icon)}</span><div><small>${label}</small><div class="val is-empty" data-cfg="${key}" data-cfg-mode="value"${key === "telegram" ? ' data-cfg-label="Написать в Telegram"' : key === "whatsapp" ? ' data-cfg-label="Написать в WhatsApp"' : ""}>${fallback}</div></div></div>`;
+const contactItem = (key, icon, label, text = "") =>
+  `<a class="contact-item" data-cfg="${key}" href="#" hidden${text ? " data-cfg-keep-text" : ""}><span class="icon-wrap">${ic(icon)}</span><span><small>${label}</small><span class="val" data-cfg-text>${text}</span></span></a>`;
 
 pages.push({
   path: "contacts.html",
   title: "Контакты и запись",
   active: "contacts",
-  description: "Запись на приём к доктору Кудрявцевой: онлайн-форма, телефон, мессенджеры и адрес.",
+  description: "Запись на приём к доктору Кудрявцевой: онлайн-форма, телефон и мессенджеры.",
+  jsonld: crumbsLd([{ name: "Контакты", path: "contacts.html" }]),
   body: (p) => `
 <section class="page-hero">
   <div class="container hero-anim">
     ${crumbs(p, [{ label: "Контакты" }])}
     <span class="eyebrow">Контакты</span>
     <h1>Контакты и запись</h1>
-    <p class="lead">Оставьте заявку — с вами свяжутся, чтобы подобрать удобное время. Или свяжитесь напрямую по телефону и в мессенджерах.</p>
+    <p class="lead">Оставьте заявку на сайте или свяжитесь напрямую — вам помогут подобрать удобное время консультации.</p>
   </div>
 </section>
-<section class="section" style="padding-top:0">
+<section class="section section--flush-top">
   <div class="container contact-grid">
-    <div class="contact-list">
-      ${contactItem("i-phone", "Телефон", "phone", "Номер будет добавлен")}
-      ${contactItem("i-send", "Telegram", "telegram", "Ссылка будет добавлена")}
-      ${contactItem("i-chat", "WhatsApp", "whatsapp", "Ссылка будет добавлена")}
-      ${contactItem("i-pin", "Адрес", "address", "Адрес будет добавлен")}
-      ${contactItem("i-clock", "Часы приёма", "hours", "График будет добавлен")}
-      <a class="btn btn--ghost" data-cfg="mapUrl" href="#" hidden>${ic("i-pin")}Открыть на карте</a>
+    <div class="contact-side">
+      <div class="contact-list" data-contact-list>
+        ${contactItem("phone", "i-phone", "Телефон")}
+        ${contactItem("telegram", "i-send", "Telegram", "Написать в Telegram")}
+        ${contactItem("whatsapp", "i-chat", "WhatsApp", "Написать в WhatsApp")}
+        ${contactItem("email", "i-mail", "Почта")}
+        <div class="contact-item" data-cfg="address" data-cfg-mode="show" hidden><span class="icon-wrap">${ic("i-pin")}</span><span><small>Адрес</small><span class="val" data-cfg-from="address"></span><a class="link-arrow" data-cfg="mapUrl" href="#" hidden><span>Открыть на карте</span>${ic("i-arrow")}</a></span></div>
+        <div class="contact-item" data-cfg="hours" data-cfg-mode="show" hidden><span class="icon-wrap">${ic("i-clock")}</span><span><small>Часы приёма</small><span class="val" data-cfg-from="hours"></span></span></div>
+      </div>
+      <div class="panel">
+        <h3>${ic("i-calendar")}Как проходит запись</h3>
+        <ol class="how-book" style="list-style:none">
+          <li><span class="step-num">1</span><span>Вы оставляете заявку или пишете в удобный мессенджер.</span></li>
+          <li><span class="step-num">2</span><span>Вам перезванивают и подбирают время консультации.</span></li>
+          <li><span class="step-num">3</span><span>На приёме врач проводит диагностику и предлагает план лечения.</span></li>
+        </ol>
+      </div>
     </div>
     <div class="form-card" id="zapis">
       <div class="detail-block" style="gap:8px">
@@ -587,24 +640,82 @@ pages.push({
 `,
 });
 
-/* ---------------- Политика ---------------- */
+/* ---------------- Юридические документы ---------------- */
+const requisites = `<div class="requisites" data-requisites hidden>
+  <b>Сведения об операторе</b>
+  <span data-cfg="operator" data-cfg-mode="text" hidden></span>
+  <span data-cfg="inn" data-cfg-mode="text" data-cfg-prefix="ИНН " hidden></span>
+  <span data-cfg="ogrn" data-cfg-mode="text" data-cfg-prefix="ОГРН/ОГРНИП " hidden></span>
+  <span data-cfg="legalAddress" data-cfg-mode="text" data-cfg-prefix="Адрес: " hidden></span>
+  <span data-cfg="email" data-cfg-mode="text" data-cfg-prefix="E-mail для обращений: " hidden></span>
+  <span data-cfg="license" data-cfg-mode="text" hidden></span>
+</div>`;
+
 pages.push({
   path: "privacy.html",
-  title: "Политика обработки персональных данных",
+  title: "Политика конфиденциальности",
   active: "",
-  description: "Политика обработки персональных данных сайта доктора Кудрявцевой.",
+  description: "Политика обработки персональных данных пользователей сайта «Доктор Кудрявцева».",
   body: (p) => `
 <section class="page-hero">
   <div class="container hero-anim">
-    ${crumbs(p, [{ label: "Политика обработки данных" }])}
+    ${crumbs(p, [{ label: "Политика конфиденциальности" }])}
     <h1>Политика обработки персональных данных</h1>
   </div>
 </section>
-<section class="section" style="padding-top:0">
+<section class="section section--flush-top">
   <div class="container prose">
-    ${todo("<b>Раздел для заполнения.</b> Текст политики составляется с учётом требований 152-ФЗ «О персональных данных» и должен содержать сведения об операторе (ФИО/наименование, ИНН, адрес), цели и состав обрабатываемых данных, сроки хранения и порядок отзыва согласия. Рекомендуем согласовать текст с юристом.")}
-    <h2>Какие данные собирает форма записи</h2>
-    <p>Имя, номер телефона, выбранная услуга и комментарий — только для того, чтобы связаться с вами и записать на приём.</p>
+    ${requisites}
+    <h2>1. Общие положения</h2>
+    <p>Настоящая политика определяет порядок обработки и защиты персональных данных пользователей сайта «${SITE}» (далее — Сайт) в соответствии с Федеральным законом от 27.07.2006 № 152-ФЗ «О персональных данных». Оператором персональных данных является лицо, сведения о котором указаны на этой странице (далее — Оператор).</p>
+    <h2>2. Какие данные обрабатываются</h2>
+    <ul>
+      <li>имя (как к пользователю обращаться);</li>
+      <li>номер телефона;</li>
+      <li>выбранная услуга и комментарий, если пользователь его оставил;</li>
+      <li>технические данные, которые браузер передаёт автоматически при посещении Сайта (IP-адрес, сведения о браузере).</li>
+    </ul>
+    <p>Через форму Сайта не запрашиваются сведения о состоянии здоровья. Пожалуйста, не указывайте их в комментарии — подробности обсуждаются на приёме.</p>
+    <h2>3. Цели обработки</h2>
+    <ul>
+      <li>связь с пользователем по его заявке и запись на консультацию;</li>
+      <li>ответы на обращения пользователя.</li>
+    </ul>
+    <h2>4. Правовые основания</h2>
+    <p>Обработка осуществляется на основании согласия пользователя, которое он даёт, отмечая соответствующее поле в форме записи.</p>
+    <h2>5. Порядок и сроки обработки</h2>
+    <p>Данные обрабатываются с использованием средств автоматизации и без них: сбор, запись, хранение, использование, удаление. Данные хранятся не дольше, чем этого требуют цели обработки, либо до отзыва согласия. Оператор не передаёт данные третьим лицам, за исключением случаев, предусмотренных законодательством РФ, и сервисов, необходимых для доставки заявки Оператору.</p>
+    <h2>6. Права пользователя</h2>
+    <p>Пользователь вправе получить сведения об обработке своих данных, потребовать их уточнения, блокирования или удаления, а также отозвать согласие, направив Оператору обращение по контактам, указанным на Сайте.</p>
+    <h2>7. Защита данных</h2>
+    <p>Оператор принимает правовые, организационные и технические меры для защиты персональных данных от неправомерного доступа, изменения, раскрытия или уничтожения.</p>
+    <h2>8. Изменение политики</h2>
+    <p>Оператор может обновлять настоящую политику. Актуальная версия всегда доступна на этой странице.</p>
+  </div>
+</section>
+`,
+});
+
+pages.push({
+  path: "consent.html",
+  title: "Согласие на обработку персональных данных",
+  active: "",
+  description: "Согласие пользователя на обработку персональных данных при записи через сайт «Доктор Кудрявцева».",
+  body: (p) => `
+<section class="page-hero">
+  <div class="container hero-anim">
+    ${crumbs(p, [{ label: "Согласие на обработку данных" }])}
+    <h1>Согласие на обработку персональных данных</h1>
+  </div>
+</section>
+<section class="section section--flush-top">
+  <div class="container prose">
+    ${requisites}
+    <p>Отправляя форму записи на сайте «${SITE}», я свободно, своей волей и в своём интересе даю согласие Оператору, сведения о котором указаны на этой странице, на обработку моих персональных данных: имени, номера телефона, выбранной услуги и комментария.</p>
+    <p>Цель обработки — связь со мной по моей заявке и запись на консультацию.</p>
+    <p>Согласие распространяется на сбор, запись, систематизацию, хранение, уточнение, использование и удаление данных с использованием средств автоматизации и без них.</p>
+    <p>Согласие действует до достижения цели обработки или до его отзыва. Я могу отозвать согласие, направив Оператору обращение по контактам, указанным на сайте.</p>
+    <p>С <a href="${p}privacy.html">политикой обработки персональных данных</a> ознакомлен(а).</p>
   </div>
 </section>
 `,
@@ -615,6 +726,8 @@ pages.push({
   path: "404.html",
   title: "Страница не найдена",
   active: "",
+  abs: true,
+  noindex: true,
   description: "Страница не найдена.",
   body: (p) => `
 <section class="page-hero" style="min-height:50vh">
@@ -635,11 +748,9 @@ for (const pg of pages) {
   writeFileSync(out, page(pg));
 }
 
-const robots = `User-agent: *\nAllow: /\n${SITE_URL ? `Sitemap: ${SITE_URL}/sitemap.xml\n` : ""}`;
-writeFileSync(join(ROOT, "robots.txt"), robots);
-if (SITE_URL) {
-  const urls = pages.filter((x) => x.path !== "404.html").map((x) =>
-    `  <url><loc>${SITE_URL}/${x.path === "index.html" ? "" : x.path}</loc></url>`).join("\n");
-  writeFileSync(join(ROOT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
-}
+writeFileSync(join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);
+const today = new Date().toISOString().slice(0, 10);
+const urls = pages.filter((x) => !x.noindex).map((x) =>
+  `  <url><loc>${SITE_URL}/${x.path === "index.html" ? "" : x.path}</loc><lastmod>${today}</lastmod></url>`).join("\n");
+writeFileSync(join(ROOT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
 console.log("Готово:", pages.map((x) => x.path).join(", "));

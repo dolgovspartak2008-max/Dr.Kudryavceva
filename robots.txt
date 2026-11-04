@@ -1,2 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+
+Sitemap: https://dr-kudryavceva.vercel.app/sitemap.xml
