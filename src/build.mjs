@@ -1,6 +1,7 @@
 // Сборка статических страниц: node src/build.mjs
 // Шапка, подвал, иконки и форма записи общие для всех страниц.
-import { writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { SPECS, PERKS, STEPS, SERVICES, ABOUT } from "./content.mjs";
@@ -11,7 +12,14 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE_URL = "https://dr-kudryavceva.vercel.app";
 
 const SITE = "Доктор Кудрявцева";
-const VER = "2";
+// Версия ресурсов = хеш содержимого CSS/JS: при любой правке браузеры сразу берут свежие файлы.
+const VER = (() => {
+  const h = createHash("sha1");
+  for (const f of ["assets/css/style.css", "assets/js/main.js", "assets/js/config.js", "assets/js/cases.js"]) {
+    try { h.update(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", f))); } catch {}
+  }
+  return h.digest("hex").slice(0, 10);
+})();
 
 /* ---------------- Иконки ---------------- */
 const TOOTH = "M7.5 3C5 3 3.5 5 3.5 7.6c0 2.3 1 3.7 1.5 5.6.6 2.4.6 7.8 2.6 7.8 1.6 0 1.6-3.3 2.1-5 .4-1.4.9-2.3 2.3-2.3s1.9.9 2.3 2.3c.5 1.7.5 5 2.1 5 2 0 2-5.4 2.6-7.8.5-1.9 1.5-3.3 1.5-5.6C20.5 5 19 3 16.5 3c-2 0-3 1-4.5 1S9.5 3 7.5 3z";
