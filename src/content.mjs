@@ -26,6 +26,7 @@ export const STEPS = [
 export const SERVICES = [
   {
     slug: "esteticheskaya-restavraciya",
+    image: "assets/img/services/esteticheskaya-restavraciya.webp",
     cat: "restavraciya",
     icon: "i-sparkle-tooth",
     title: "Эстетическая реставрация зубов",
@@ -57,6 +58,7 @@ export const SERVICES = [
   },
   {
     slug: "slozhnoe-perelechivanie",
+    image: "assets/img/services/slozhnoe-perelechivanie.webp",
     cat: "perelechivanie",
     icon: "i-root",
     title: "Сложное перелечивание зубов",
@@ -88,6 +90,7 @@ export const SERVICES = [
   },
   {
     slug: "protezirovanie",
+    image: "assets/img/services/protezirovanie.webp",
     cat: "protezirovanie",
     icon: "i-crown",
     title: "Протезирование зубов",
@@ -118,6 +121,7 @@ export const SERVICES = [
   },
   {
     slug: "implantaciya",
+    image: "assets/img/services/implantaciya.webp",
     cat: "implantaciya",
     icon: "i-implant",
     title: "Имплантация",
@@ -147,6 +151,7 @@ export const SERVICES = [
   },
   {
     slug: "kostnaya-plastika",
+    image: "assets/img/services/kostnaya-plastika.webp",
     cat: "kostnaya-plastika",
     icon: "i-bone",
     title: "Костные пластики",
@@ -175,6 +180,7 @@ export const SERVICES = [
   },
   {
     slug: "udalenie-zubov-mudrosti",
+    image: "assets/img/services/udalenie-zubov-mudrosti.webp",
     cat: "udalenie",
     icon: "i-extract",
     title: "Удаление зубов мудрости",

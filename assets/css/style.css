@@ -526,9 +526,9 @@ a.contact-item:hover { border-color: var(--gold-light); box-shadow: var(--shadow
 .footer-contacts .icon { width: 19px; height: 19px; color: var(--gold-deep); }
 .footer-contacts .circle-link { width: 46px; height: 46px; border-radius: 50%; display: inline-grid; place-items: center; background: var(--white); border: 1px solid var(--line); box-shadow: var(--shadow-soft); }
 .circle-link .icon { width: 20px; height: 20px; }
-.footer-services { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: .86rem; color: var(--muted); }
-.footer-services a { text-decoration: none; padding: 6px 0; display: inline-block; }
-.footer-services a:hover { color: var(--cocoa); }
+.footer-contacts .pill-link { gap: 8px; padding: 0 16px; min-height: 44px; border-radius: 999px; background: var(--white); border: 1px solid var(--line); font-size: .9rem; box-shadow: var(--shadow-soft); transition: border-color .2s, color .2s; }
+.footer-contacts .pill-link:hover { border-color: var(--gold); }
+.footer-contacts .pill-link .icon { width: 17px; height: 17px; }
 .footer-bottom { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 20px; color: var(--muted); font-size: .82rem; }
 .footer-bottom a { color: inherit; }
 .footer-legal { display: grid; gap: 4px; }
@@ -644,7 +644,10 @@ a.contact-item:hover { border-color: var(--gold-light); box-shadow: var(--shadow
   .micro-visual { max-width: 240px; order: -1; }
   .contact-grid { grid-template-columns: 1fr; }
 
-  .footer-top { flex-direction: column; align-items: flex-start; }
+  .footer-top { flex-direction: column; align-items: flex-start; gap: 18px; }
+  .footer-nav ul { gap: 0 20px; }
+  .footer-nav a { padding: 6px 0; }
+  .footer-contacts { gap: 10px; }
 
   .mobile-cta {
     display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; gap: 10px;
@@ -655,7 +658,7 @@ a.contact-item:hover { border-color: var(--gold-light); box-shadow: var(--shadow
   .mobile-cta.is-visible { transform: none; }
   .mobile-cta.is-visible.is-suppressed { transform: translateY(110%); }
   .mobile-cta .btn { flex: 1; min-height: 50px; }
-  .site-footer { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+  .site-footer { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
 }
 
 @media (max-width: 400px) {
@@ -684,3 +687,22 @@ a.contact-item:hover { border-color: var(--gold-light); box-shadow: var(--shadow
 .bio-facts b { font-family: var(--f-display); font-weight: 400; font-size: 1.5rem; color: var(--gold-deep); line-height: 1.1; }
 .bio-facts span { color: var(--muted); font-size: .95rem; }
 @media (max-width: 760px) { .bio-grid { grid-template-columns: 1fr; } }
+
+/* ---------- Примеры работ: все фото сразу ---------- */
+.case-list { display: grid; gap: 20px; }
+.case-row { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: clamp(18px, 3vw, 36px); align-items: center; padding: clamp(14px, 2vw, 22px); border-radius: var(--radius); background: var(--white); border: 1px solid var(--line); box-shadow: 0 10px 24px -22px rgba(58,40,27,.5); }
+.case-row .case-info { padding: 0; align-content: center; }
+.case-row .case-info h3 { font-size: 1.4rem; }
+.case-photos { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 10px; }
+.case-photo { margin: 0; display: grid; gap: 8px; }
+.case-photo button { padding: 0; border: 0; background: var(--ivory); border-radius: 14px; overflow: hidden; cursor: zoom-in; aspect-ratio: 3 / 4; display: block; }
+.case-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.case-photo button:hover img { transform: scale(1.04); }
+.case-photo figcaption { text-align: center; font-size: .8rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--gold-deep); }
+@media (max-width: 860px) {
+  .case-row { grid-template-columns: 1fr; }
+  .case-photos { gap: 6px; }
+  .case-photo button { border-radius: 10px; }
+  .case-photo figcaption { font-size: .68rem; letter-spacing: .04em; }
+}
+.service-art.has-img::after { display: none; }

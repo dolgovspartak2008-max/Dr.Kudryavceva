@@ -126,14 +126,11 @@ function footer(p) {
       <a class="logo" href="${link(p, "index")}">${ic("i-tooth")}<span class="logo-text"><span>Доктор</span><span>Кудрявцева</span></span></a>
       <nav class="footer-nav" aria-label="Разделы сайта"><ul>${NAV.map((n) => `<li><a href="${link(p, n.href)}">${n.label}</a></li>`).join("")}</ul></nav>
       <div class="footer-contacts">
-        <a data-cfg="phone" href="#" hidden>${ic("i-phone")}<span data-cfg-text></span></a>
-        <a data-cfg="mapUrl" data-cfg-keep-text href="#" hidden>${ic("i-pin")}<span data-cfg-from="address">На карте</span></a>
-        <a class="circle-link" data-cfg="telegram" href="#" hidden aria-label="Telegram">${ic("i-send")}</a>
-        <a class="circle-link" data-cfg="whatsapp" href="#" hidden aria-label="WhatsApp">${ic("i-chat")}</a>
-        <a data-cfg="telegramChannel" data-cfg-keep-text href="#" hidden>${ic("i-send")}<span>Telegram-канал</span></a>
+        <a class="pill-link" data-cfg="telegram" data-cfg-keep-text href="#" hidden>${ic("i-send")}<span>Telegram</span></a>
+        <a class="pill-link" data-cfg="whatsapp" data-cfg-keep-text href="#" hidden>${ic("i-chat")}<span>WhatsApp</span></a>
+        <a class="pill-link" data-cfg="telegramChannel" data-cfg-keep-text href="#" hidden>${ic("i-send")}<span>Telegram-канал</span></a>
       </div>
     </div>
-    <div class="footer-services">${SERVICES.map((s) => `<a href="${p}services/${s.slug}.html">${s.title}</a>`).join("")}</div>
     <div class="footer-bottom">
       <div class="footer-legal">
         <span>© <span data-year>2026</span> ${SITE}. <a href="${p}privacy.html">Политика конфиденциальности</a> · <a href="${p}consent.html">Согласие на обработку данных</a></span>
@@ -143,10 +140,7 @@ function footer(p) {
     </div>
   </div>
 </footer>
-<div class="mobile-cta">
-  <a class="btn btn--ghost" data-cfg="phone" data-cfg-keep-text href="#" hidden aria-label="Позвонить">${ic("i-phone")}Позвонить</a>
-  <a class="btn btn--primary" href="${p}contacts.html#zapis">${ic("i-calendar")}Записаться</a>
-</div>`;
+`;
 }
 
 function serviceOptions(selected = "") {
@@ -202,7 +196,7 @@ function bookingBand(p, id, selected = "") {
 }
 
 function serviceArt(p, s) {
-  return `<span class="service-art">${s.image ? `<img src="${p}${s.image}" alt="" loading="lazy" decoding="async">` : ic(s.icon)}</span>`;
+  return `<span class="service-art${s.image ? " has-img" : ""}">${s.image ? `<img src="${p}${s.image}" alt="" loading="lazy" decoding="async">` : ic(s.icon)}</span>`;
 }
 
 function serviceCard(p, s, withText = false) {
@@ -333,6 +327,13 @@ pages.push({
   </div>
 </section>
 
+<section class="section section--ivory" aria-labelledby="cases-title" data-cases-section hidden>
+  <div class="container">
+    <div class="section-head"><div><span class="eyebrow">Примеры работ</span><h2 id="cases-title">Примеры лечения</h2></div></div>
+    <div class="case-list" data-cases></div>
+  </div>
+</section>
+
 <section class="about-band" aria-labelledby="about-title">
   <div class="container about-grid">
     <figure class="about-photo">${portrait(p, { photo: "hand", sizes: "(max-width: 760px) 100vw, 400px" })}</figure>
@@ -351,26 +352,6 @@ pages.push({
   </div>
 </section>
 
-<section class="section" aria-labelledby="cases-title" data-cases-section hidden>
-  <div class="container">
-    <div class="section-head">
-      <div><span class="eyebrow">Примеры работ</span><h2 id="cases-title">Примеры лечения</h2></div>
-      <div class="carousel-nav" aria-label="Листать примеры">
-        <button type="button" data-carousel="prev" aria-label="Предыдущий случай">${ic("i-chev-left")}</button>
-        <button type="button" data-carousel="next" aria-label="Следующий случай">${ic("i-chev-right")}</button>
-      </div>
-      <a class="link-arrow" href="${p}cases.html"><span>Смотреть все работы</span>${ic("i-arrow")}</a>
-    </div>
-    <div class="cases-grid is-carousel" data-cases data-limit="6"></div>
-  </div>
-</section>
-
-<section class="section section--ivory" aria-labelledby="steps-title">
-  <div class="container">
-    <div class="section-head"><div><span class="eyebrow">Этапы лечения</span><h2 id="steps-title">Как проходит лечение</h2></div></div>
-    ${stepsList(true)}
-  </div>
-</section>
 
 ${bookingBand(p, "home")}
 `,
@@ -406,12 +387,6 @@ pages.push({
     </a>`).join("")}
   </div>
 </section>
-<section class="section section--ivory">
-  <div class="container">
-    <div class="section-head"><div><span class="eyebrow">Этапы лечения</span><h2>Как проходит лечение</h2></div></div>
-    ${stepsList()}
-  </div>
-</section>
 ${bookingBand(p, "services")}
 `,
 });
@@ -436,10 +411,9 @@ for (const s of SERVICES) {
       <p class="lead">${s.lead}</p>
       <div class="btn-row">
         <a class="btn btn--primary" href="#svc-booking">${ic("i-calendar")}Записаться на приём</a>
-        <a class="btn btn--ghost" href="${p}cases.html#${s.cat}">Примеры работ</a>
       </div>
     </div>
-    ${serviceArt(p, s).replace('class="service-art"', 'class="service-art" aria-hidden="true"')}
+    ${serviceArt(p, s).replace('<span class="service-art', '<span aria-hidden="true" class="service-art')}
   </div>
 </section>
 <section class="section section--flush-top">
@@ -503,7 +477,6 @@ pages.push({
       <ul class="specs">${SPECS.map((s) => `<li>${s}</li>`).join("")}</ul>
       <p class="lead">Ведущий стоматолог-терапевт — эндодонтист (микроскопист). Работает по специальности с 2018 года.</p>
       <div class="btn-row">
-        <a class="btn btn--primary" href="${p}contacts.html#zapis">${ic("i-calendar")}Записаться на приём</a>
         <a class="btn btn--ghost" href="${p}services.html">Все услуги</a>
       </div>
     </div>
@@ -577,12 +550,6 @@ ${QUAL.length ? `<section class="section">
   </div>
 </section>` : ""}
 
-<section class="section">
-  <div class="container">
-    <div class="section-head"><div><span class="eyebrow">Этапы лечения</span><h2>Как проходит лечение</h2></div></div>
-    ${stepsList()}
-  </div>
-</section>
 ${bookingBand(p, "about")}
 `,
 });
@@ -607,8 +574,8 @@ pages.push({
 <section class="section section--flush-top">
   <div class="container">
     <div class="filters" data-case-filters role="group" aria-label="Категории работ" hidden></div>
-    <div class="cases-grid" data-cases data-category="all" aria-live="polite"></div>
-    <p class="muted" data-cases-note hidden style="margin-top:24px;font-size:.88rem;display:flex;gap:10px;align-items:flex-start">${ic("i-info")}<span>Подписи «До» и «После» ставятся только для случаев, порядок снимков в которых подтверждён доктором. Результат лечения индивидуален.</span></p>
+    <div class="case-list" data-cases data-category="all" aria-live="polite"></div>
+    <p class="muted" data-cases-note hidden style="margin-top:24px;font-size:.88rem;display:flex;gap:10px;align-items:flex-start">${ic("i-info")}<span>Фотографии публикуются без ретуши. Результат лечения индивидуален.</span></p>
   </div>
 </section>
 ${bookingBand(p, "cases")}

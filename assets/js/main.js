@@ -230,31 +230,27 @@
   }
   function src(ph) { return /^(https?:)?\//.test(ph.src) ? ph.src : BASE + ph.src; }
 
-  function caseMedia(c, idx) {
+  // Все фото случая видны сразу, с подписями этапов; клик — увеличение.
+  function caseLabel(c, i) {
+    if (c.labels && c.labels[i]) return c.labels[i];
     if (isConfirmed(c)) {
-      var b = c.photos[c.before != null ? c.before : 0], a = c.photos[c.after != null ? c.after : 1];
-      return '<div class="ba" style="--pos:50%">' +
-        '<img src="' + esc(src(b)) + '" alt="' + esc(b.alt || "До лечения") + '" loading="lazy" decoding="async">' +
-        '<img class="ba-after" src="' + esc(src(a)) + '" alt="' + esc(a.alt || "После лечения") + '" loading="lazy" decoding="async">' +
-        '<span class="ba-handle"></span><span class="badge">До</span><span class="badge badge--after">После</span>' +
-        '<input type="range" min="0" max="100" value="50" aria-label="Сравнить до и после: ' + esc(c.title) + '"></div>';
+      if (i === (c.before != null ? c.before : 0)) return "До";
+      if (i === (c.after != null ? c.after : 1)) return "После";
     }
-    return '<div class="case-pair">' + c.photos.slice(0, 2).map(function (ph, i) {
-      return '<button type="button" data-lb="' + idx + '" data-lb-i="' + i + '" aria-label="Увеличить фото ' + (i + 1) + ': ' + esc(c.title) + '">' +
-        '<img src="' + esc(src(ph)) + '" alt="' + esc(ph.alt || c.title) + '" loading="lazy" decoding="async"></button>';
-    }).join("") + "</div>";
+    return "";
   }
-
   function caseCard(c) {
     var idx = cases.indexOf(c);
-    var note = !isConfirmed(c) ? '<span class="stage-note">Этапы лечения · ' + c.photos.length + " фото</span>"
-      : c.photos.length > 2 ? '<span class="stage-note">' + c.photos.length + " фото: " + esc((c.labels || []).join(" → ").toLowerCase()) + "</span>" : "";
-    return '<article class="case-card" data-reveal>' +
-      '<div class="case-media">' + caseMedia(c, idx) + "</div>" +
+    var photos = c.photos.map(function (ph, i) {
+      var lbl = caseLabel(c, i);
+      return '<figure class="case-photo"><button type="button" data-lb="' + idx + '" data-lb-i="' + i + '" aria-label="Увеличить фото' + (lbl ? " «" + esc(lbl) + "»" : " " + (i + 1)) + ': ' + esc(c.title) + '">' +
+        '<img src="' + esc(src(ph)) + '" alt="' + esc(ph.alt || c.title) + '" loading="lazy" decoding="async"></button>' +
+        (lbl ? '<figcaption>' + esc(lbl) + "</figcaption>" : "") + "</figure>";
+    }).join("");
+    return '<article class="case-row" data-reveal>' +
       '<div class="case-info"><span class="cat">' + esc(CATEGORIES[c.category] || "") + "</span>" +
-      "<h3>" + esc(c.title) + "</h3>" + (c.text ? "<p>" + esc(c.text) + "</p>" : "") + note + "</div>" +
-      '<button type="button" class="go" data-lb="' + idx + '" data-lb-i="0" aria-label="Открыть галерею: ' + esc(c.title) + '">' + icon("i-arrow") + "</button>" +
-      "</article>";
+      "<h3>" + esc(c.title) + "</h3>" + (c.text ? "<p>" + esc(c.text) + "</p>" : "") + "</div>" +
+      '<div class="case-photos" style="--n:' + c.photos.length + '">' + photos + "</div></article>";
   }
 
   function renderCases(root) {
@@ -270,9 +266,6 @@
       return;
     }
     root.innerHTML = list.map(caseCard).join("");
-    $$(".ba input", root).forEach(function (r) {
-      r.addEventListener("input", function () { r.parentNode.style.setProperty("--pos", r.value + "%"); });
-    });
     watchReveal(root);
   }
 
@@ -371,7 +364,7 @@
     var bi = c.before != null ? c.before : 0, ai = c.after != null ? c.after : 1;
     lbList = c.photos.map(function (p, i) {
       var lbl = c.labels && c.labels[i] ? c.labels[i] : (conf ? (i === bi ? "До" : i === ai ? "После" : "") : "");
-      return { src: p.src, alt: p.alt, label: lbl };
+      return { src: p.src, alt: p.alt, label: caseLabel(c, i) };
     });
     lightbox.hidden = false; document.body.classList.add("menu-open");
     showLb(parseInt(t.getAttribute("data-lb-i") || "0", 10));
