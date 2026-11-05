@@ -256,8 +256,50 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <link rel="stylesheet" href="${p}assets/css/style.css?v=${VER}">
 ${path === "index.html" ? `<link rel="preload" as="image" type="image/webp" imagesrcset="${p}assets/img/kudryavtseva-front-520.webp 520w, ${p}assets/img/kudryavtseva-front-860.webp 860w, ${p}assets/img/kudryavtseva-front-917.webp 917w" imagesizes="(max-width: 760px) 92vw, 42vw">` : ""}
 ${jsonld}
+<script>try{if(sessionStorage.getItem("introSeen")||matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("no-intro")}catch(e){}</script>
+<style>
+.intro{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;align-content:center;gap:18px;background:radial-gradient(circle at 50% 42%,#fffaf3 0%,#f6ede1 55%,#efe3d2 100%);transition:opacity .5s ease,visibility .5s;}
+.no-intro .intro{display:none}
+.intro.is-done{opacity:0;visibility:hidden}
+.intro svg{width:132px;height:132px;overflow:visible}
+.intro .t-fill{fill:url(#introDull);opacity:0;animation:introFill .6s .55s ease forwards}
+.intro .t-clean{fill:url(#introPearl);opacity:0;animation:introClean .7s 1.35s ease forwards}
+.intro .t-line{fill:none;stroke:#b88a4f;stroke-width:.55;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:100;stroke-dashoffset:100;filter:drop-shadow(0 0 .6px #e6c48e) drop-shadow(0 0 1.6px rgba(217,185,138,.9));animation:introDraw 1.25s .15s cubic-bezier(.55,.1,.35,1) forwards}
+.intro .t-spark{offset-path:path("M7.5 3C5 3 3.5 5 3.5 7.6c0 2.3 1 3.7 1.5 5.6.6 2.4.6 7.8 2.6 7.8 1.6 0 1.6-3.3 2.1-5 .4-1.4.9-2.3 2.3-2.3s1.9.9 2.3 2.3c.5 1.7.5 5 2.1 5 2 0 2-5.4 2.6-7.8.5-1.9 1.5-3.3 1.5-5.6C20.5 5 19 3 16.5 3c-2 0-3 1-4.5 1S9.5 3 7.5 3z");offset-distance:0%;fill:#fff;filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 2.4px #e9c88f);opacity:0;animation:introSpark 1.25s .15s cubic-bezier(.55,.1,.35,1) forwards}
+.intro .t-shine{transform:translateX(-14px) skewX(-18deg);transform-box:view-box;animation:introShine .8s 1.45s ease-in-out forwards}
+.intro .t-star{transform-box:fill-box;transform-origin:center;transform:scale(0) rotate(-30deg);fill:#fff;filter:drop-shadow(0 0 1.2px #e9c88f)}
+.intro .t-star.s1{animation:introStar .7s 1.85s ease-out forwards}
+.intro .t-star.s2{animation:introStar .6s 2.0s ease-out forwards}
+.intro-name{font:600 .74rem/1.2 Manrope,system-ui,sans-serif;letter-spacing:.32em;text-transform:uppercase;color:#8b6233;opacity:0;transform:translateY(6px);animation:introName .6s 1.1s ease forwards}
+@keyframes introDraw{to{stroke-dashoffset:0}}
+@keyframes introSpark{0%{opacity:0;offset-distance:0%}8%{opacity:1}92%{opacity:1}100%{opacity:0;offset-distance:100%}}
+@keyframes introFill{to{opacity:1}}
+@keyframes introClean{to{opacity:1}}
+@keyframes introShine{to{transform:translateX(30px) skewX(-18deg)}}
+@keyframes introStar{0%{transform:scale(0) rotate(-30deg);opacity:0}50%{transform:scale(1.15) rotate(10deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes introName{to{opacity:1;transform:none}}
+</style>
 </head>
 <body data-base="${p}">
+<div class="intro" aria-hidden="true">
+  <svg viewBox="0 0 24 24">
+    <defs>
+      <linearGradient id="introDull" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#efe0c6"/><stop offset="1" stop-color="#dcc29b"/></linearGradient>
+      <linearGradient id="introPearl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#fbf6ee"/><stop offset="1" stop-color="#efe3d0"/></linearGradient>
+      <linearGradient id="introGlow" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <clipPath id="introClip"><path d="${TOOTH}"/></clipPath>
+    </defs>
+    <path class="t-fill" d="${TOOTH}"/>
+    <path class="t-clean" d="${TOOTH}"/>
+    <g clip-path="url(#introClip)"><rect class="t-shine" x="-2" y="0" width="6" height="24" fill="url(#introGlow)"/></g>
+    <path class="t-line" d="${TOOTH}" pathLength="100"/>
+    <circle class="t-spark" r=".7"/>
+    <path class="t-star s1" d="M18.6 1.2l.45 1.35 1.35.45-1.35.45-.45 1.35-.45-1.35-1.35-.45 1.35-.45z"/>
+    <path class="t-star s2" d="M6.2 5.4l.3.9.9.3-.9.3-.3.9-.3-.9-.9-.3.9-.3z"/>
+  </svg>
+  <span class="intro-name">Доктор Кудрявцева</span>
+</div>
+<script>(function(){var d=document.documentElement;if(d.classList.contains("no-intro"))return;var el=document.querySelector(".intro");function done(){if(!el||el.classList.contains("is-done"))return;el.classList.add("is-done");try{sessionStorage.setItem("introSeen","1")}catch(e){}setTimeout(function(){el&&el.remove()},600)}setTimeout(done,2700);el&&el.addEventListener("click",done)})();</script>
 ${sprite}
 ${header(p, active)}
 <main id="main">

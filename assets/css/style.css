@@ -630,7 +630,9 @@ a.contact-item:hover { border-color: var(--gold-light); box-shadow: var(--shadow
   .form .btn { width: 100%; }
 
   .detail-hero { grid-template-columns: 1fr; }
-  .detail-hero .service-art { max-width: 140px; justify-self: start; order: -1; border-radius: 22px; }
+  .detail-hero { gap: 18px; }
+  .detail-hero .service-art { max-width: none; width: 100%; aspect-ratio: 16 / 10; justify-self: stretch; order: -1; border-radius: 22px; box-shadow: 0 24px 40px -30px rgba(58,40,27,.6); }
+  .detail-hero .service-art img { object-position: 50% 45%; }
   .bullets { grid-template-columns: 1fr; }
   .service-row { grid-template-columns: 112px minmax(0, 1fr); padding: 10px 14px 10px 10px; }
   .service-row .service-art .icon { width: 44px; height: 44px; }
