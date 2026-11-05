@@ -433,7 +433,7 @@ body.menu-open { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .micro-visual::after { animation: none; } }
 
 .qual-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.qual-list li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.qual-list li { display: grid; grid-template-columns: 6.6em minmax(0, 1fr); gap: 4px 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .qual-list .y { font-family: var(--f-display); color: var(--gold-deep); font-size: 1.1rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .qual-list .t { display: grid; gap: 4px; }
 .qual-list .t b { color: var(--cocoa); font-weight: 600; }
@@ -677,3 +677,13 @@ a.contact-item:hover { border-color: var(--gold-light); box-shadow: var(--shadow
   .perk { flex-direction: row; align-items: center; }
   .perk + .perk { border-left: 0; border-top: 1px solid var(--line); }
 }
+
+/* ---------- О докторе: текст ---------- */
+.bio-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: start; }
+.bio-text { display: grid; gap: 16px; font-size: var(--step-1); line-height: 1.65; color: var(--cocoa); }
+.bio-text p { margin: 0; }
+.bio-facts { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.bio-facts li { display: grid; gap: 4px; padding: 16px 20px; border-radius: 18px; background: #fff; border: 1px solid var(--line); }
+.bio-facts b { font-family: var(--f-display); font-weight: 400; font-size: 1.5rem; color: var(--gold-deep); line-height: 1.1; }
+.bio-facts span { color: var(--muted); font-size: .95rem; }
+@media (max-width: 760px) { .bio-grid { grid-template-columns: 1fr; } }

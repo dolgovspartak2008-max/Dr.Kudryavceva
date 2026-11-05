@@ -130,6 +130,7 @@ function footer(p) {
         <a data-cfg="mapUrl" data-cfg-keep-text href="#" hidden>${ic("i-pin")}<span data-cfg-from="address">На карте</span></a>
         <a class="circle-link" data-cfg="telegram" href="#" hidden aria-label="Telegram">${ic("i-send")}</a>
         <a class="circle-link" data-cfg="whatsapp" href="#" hidden aria-label="WhatsApp">${ic("i-chat")}</a>
+        <a data-cfg="telegramChannel" data-cfg-keep-text href="#" hidden>${ic("i-send")}<span>Telegram-канал</span></a>
       </div>
     </div>
     <div class="footer-services">${SERVICES.map((s) => `<a href="${p}services/${s.slug}.html">${s.title}</a>`).join("")}</div>
@@ -338,11 +339,11 @@ pages.push({
     <div class="about-copy" data-reveal>
       <span class="eyebrow">О докторе</span>
       <h2 id="about-title">Кудрявцева <span>Анна Дмитриевна</span></h2>
-      <p class="lead">Стоматолог, специализирующийся на сложном лечении корневых каналов под микроскопом, эстетической реставрации и восстановлении зубов.</p>
+      <p class="lead">Ведущий стоматолог-терапевт — эндодонтист (микроскопист). Лектор: проводит курсы по сложной эндодонтии, художественной реставрации и работе с дентальным микроскопом.</p>
       <div class="facts">
-        <span class="fact">${ic("i-microscope")}Лечение под микроскопом</span>
-        <span class="fact">${ic("i-sparkle-tooth")}Эстетическая реставрация</span>
-        <span class="fact">${ic("i-tooth")}Комплексный подход</span>
+        <span class="fact">${ic("i-calendar")}В профессии с 2018 года</span>
+        <span class="fact">${ic("i-microscope")}Микроскоп Carl Zeiss</span>
+        <span class="fact">${ic("i-award")}№1 среди терапевтов Красногорска по версии Яндекса</span>
       </div>
       <div><a class="btn btn--ghost" href="${p}about.html">Подробнее о докторе${ic("i-arrow")}</a></div>
     </div>
@@ -500,11 +501,30 @@ pages.push({
       <span class="eyebrow">О докторе</span>
       <h1>Кудрявцева Анна Дмитриевна</h1>
       <ul class="specs">${SPECS.map((s) => `<li>${s}</li>`).join("")}</ul>
-      <p class="lead">Специализируется на сложном лечении корневых каналов под микроскопом, эстетической реставрации и восстановлении зубов.</p>
+      <p class="lead">Ведущий стоматолог-терапевт — эндодонтист (микроскопист). Работает по специальности с 2018 года.</p>
       <div class="btn-row">
         <a class="btn btn--primary" href="${p}contacts.html#zapis">${ic("i-calendar")}Записаться на приём</a>
         <a class="btn btn--ghost" href="${p}services.html">Все услуги</a>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="bio-title">
+  <div class="container bio">
+    <div class="section-head"><div><span class="eyebrow">Обо мне</span><h2 id="bio-title">Опыт и подход к лечению</h2></div></div>
+    <div class="bio-grid">
+      <div class="bio-text" data-reveal>
+        <p>Ведущий стоматолог-терапевт — эндодонтист (микроскопист). Работает по специальности с 2018 года. Является лектором, проводит курсы по сложной эндодонтии, художественной реставрации, а также по работе с дентальным микроскопом.</p>
+        <p>Лечение проводит в коффердаме под немецким дентальным микроскопом Carl Zeiss. Выполняет художественные реставрации зубов, работает со сложной эндодонтией. Практикует лечение под седацией/наркозом. Ведёт фотопротокол всех первичных пациентов, а также до/во время/после лечения.</p>
+        <p>Имеет стаж на руководящих должностях (заведующая терапевтическим отделением).</p>
+      </div>
+      <ul class="bio-facts" data-reveal>
+        <li><b>2018</b><span>начало работы по специальности</span></li>
+        <li><b>№1</b><span>в рейтинге популярных стоматологов-терапевтов г.&nbsp;Красногорска по версии Яндекса</span></li>
+        <li><b>Лектор</b><span>курсы по сложной эндодонтии, художественной реставрации и работе с микроскопом</span></li>
+        <li><b>Carl Zeiss</b><span>лечение в коффердаме под немецким дентальным микроскопом</span></li>
+      </ul>
     </div>
   </div>
 </section>
@@ -619,8 +639,9 @@ pages.push({
     <div class="contact-side">
       <div class="contact-list" data-contact-list>
         ${contactItem("phone", "i-phone", "Телефон")}
-        ${contactItem("telegram", "i-send", "Telegram", "Написать в Telegram")}
+        ${contactItem("telegram", "i-send", "Telegram", "@Kudryavceva_Anna")}
         ${contactItem("whatsapp", "i-chat", "WhatsApp", "Написать в WhatsApp")}
+        ${contactItem("telegramChannel", "i-send", "Telegram-канал", "@Dr_Vesnushka")}
         ${contactItem("email", "i-mail", "Почта")}
         <div class="contact-item" data-cfg="address" data-cfg-mode="show" hidden><span class="icon-wrap">${ic("i-pin")}</span><span><small>Адрес</small><span class="val" data-cfg-from="address"></span><a class="link-arrow" data-cfg="mapUrl" href="#" hidden><span>Открыть на карте</span>${ic("i-arrow")}</a></span></div>
         <div class="contact-item" data-cfg="hours" data-cfg-mode="show" hidden><span class="icon-wrap">${ic("i-clock")}</span><span><small>Часы приёма</small><span class="val" data-cfg-from="hours"></span></span></div>

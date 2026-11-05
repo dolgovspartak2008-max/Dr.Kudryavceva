@@ -5,8 +5,9 @@
 window.SITE_CONFIG = {
   /* Контакты */
   phone: "",            // например "+7 (900) 000-00-00"
-  telegram: "",         // ссылка, например "https://t.me/username"
-  whatsapp: "",         // ссылка, например "https://wa.me/79000000000"
+  telegram: "https://t.me/Kudryavceva_Anna",       // личные сообщения (@Kudryavceva_Anna)
+  telegramChannel: "https://t.me/Dr_Vesnushka",   // Telegram-канал
+  whatsapp: "https://wa.me/message/4WHPSEJDVZBKL1",
   email: "",
   address: "",          // город, улица, дом, кабинет
   hours: "",            // например "Пн–Пт 10:00–20:00"
