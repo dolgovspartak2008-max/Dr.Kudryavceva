@@ -58,6 +58,9 @@ node src/build.mjs
 Нужен Node.js 18+. При смене домена поменяйте `SITE_URL` в `src/build.mjs` (canonical, sitemap, og:image).
 
 ## Фотографии
-- `reference/portrait-original.png` — исходный портрет. На сайте — его уменьшенные копии
-  (`assets/img/kudryavtseva-*`): только масштабирование и сжатие, лицо и изображение не изменялись.
+- `reference/portrait-2-front.png` — портрет анфас (первый экран главной).
+- `reference/portrait-3-hand.png` — портрет с рукой (блок «О докторе» на главной и страница «О докторе»).
+  На сайте — их уменьшенные копии (`assets/img/kudryavtseva-front-*`, `kudryavtseva-hand-*`):
+  только масштабирование и сжатие, без ретуши и без генерации.
+- `reference/portrait-original.png` — прежний портрет в халате (на сайте больше не используется).
 - `reference/maket.jpg` — визуальный макет.

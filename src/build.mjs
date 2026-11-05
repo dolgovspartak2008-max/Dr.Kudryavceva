@@ -69,11 +69,17 @@ const NAV = [
 
 function link(p, href) { return href === "index" ? (p === "/" ? "/" : p || "./") : p + href; }
 
-// Портрет — только масштабированные копии исходного фото, без ретуши.
-function portrait(p, { sizes, eager = false, alt = "Анна Дмитриевна Кудрявцева, стоматолог, в белом медицинском халате" } = {}) {
+// Портреты — только масштабированные копии исходных фото, без ретуши и без генерации.
+const PHOTOS = {
+  front: { file: "kudryavtseva-front", max: 917, h: 1200, alt: "Анна Дмитриевна Кудрявцева, стоматолог" },
+  hand:  { file: "kudryavtseva-hand",  max: 883, h: 1247, alt: "Анна Дмитриевна Кудрявцева, стоматолог" },
+};
+function portrait(p, { sizes, eager = false, photo = "front", alt } = {}) {
+  const f = PHOTOS[photo];
+  const b = `${p}assets/img/${f.file}`;
   return `<picture>
-      <source type="image/webp" srcset="${p}assets/img/kudryavtseva-520.webp 520w, ${p}assets/img/kudryavtseva-860.webp 860w, ${p}assets/img/kudryavtseva-1086.webp 1086w" sizes="${sizes}">
-      <img src="${p}assets/img/kudryavtseva-860.jpg" width="860" height="1147" alt="${alt}" ${eager ? 'fetchpriority="high" decoding="async"' : 'loading="lazy" decoding="async"'}>
+      <source type="image/webp" srcset="${b}-520.webp 520w, ${b}-860.webp 860w, ${b}-${f.max}.webp ${f.max}w" sizes="${sizes}">
+      <img src="${b}-860.jpg" width="860" height="${f.h}" alt="${alt || f.alt}" ${eager ? 'fetchpriority="high" decoding="async"' : 'loading="lazy" decoding="async"'}>
     </picture>`;
 }
 
@@ -246,14 +252,14 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <meta property="og:title" content="${fullTitle}">
 <meta property="og:description" content="${description}">
 <meta property="og:url" content="${url}">
-<meta property="og:image" content="${SITE_URL}/assets/img/kudryavtseva-860.jpg">
+<meta property="og:image" content="${SITE_URL}/assets/img/kudryavtseva-front-860.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="${FAVICON}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="${p}assets/css/style.css?v=${VER}">
-${path === "index.html" ? `<link rel="preload" as="image" type="image/webp" imagesrcset="${p}assets/img/kudryavtseva-520.webp 520w, ${p}assets/img/kudryavtseva-860.webp 860w, ${p}assets/img/kudryavtseva-1086.webp 1086w" imagesizes="(max-width: 760px) 92vw, 42vw">` : ""}
+${path === "index.html" ? `<link rel="preload" as="image" type="image/webp" imagesrcset="${p}assets/img/kudryavtseva-front-520.webp 520w, ${p}assets/img/kudryavtseva-front-860.webp 860w, ${p}assets/img/kudryavtseva-front-917.webp 917w" imagesizes="(max-width: 760px) 92vw, 42vw">` : ""}
 ${jsonld}
 </head>
 <body data-base="${p}">
@@ -285,7 +291,7 @@ pages.push({
     "@type": "Dentist",
     name: SITE,
     url: SITE_URL,
-    image: SITE_URL + "/assets/img/kudryavtseva-860.jpg",
+    image: SITE_URL + "/assets/img/kudryavtseva-front-860.jpg",
     description: "Стоматологическая практика Анны Дмитриевны Кудрявцевой: эндодонтия под микроскопом, эстетическая реставрация, протезирование, имплантация.",
     employee: { "@type": "Person", name: "Анна Дмитриевна Кудрявцева", jobTitle: "Стоматолог" },
     availableService: SERVICES.map((s) => ({ "@type": "MedicalProcedure", name: s.title, url: `${SITE_URL}/services/${s.slug}.html` })),
@@ -328,7 +334,7 @@ pages.push({
 
 <section class="about-band" aria-labelledby="about-title">
   <div class="container about-grid">
-    <figure class="about-photo">${portrait(p, { sizes: "(max-width: 760px) 100vw, 400px" })}</figure>
+    <figure class="about-photo">${portrait(p, { photo: "hand", sizes: "(max-width: 760px) 100vw, 400px" })}</figure>
     <div class="about-copy" data-reveal>
       <span class="eyebrow">О докторе</span>
       <h2 id="about-title">Кудрявцева <span>Анна Дмитриевна</span></h2>
@@ -480,13 +486,13 @@ pages.push({
   description: "Анна Дмитриевна Кудрявцева — стоматолог-эндодонтист-микроскопист, ортопед, хирург-имплантолог. Лечение под микроскопом, эстетическая реставрация, комплексный подход.",
   jsonld: `<script type="application/ld+json">${JSON.stringify({
     "@context": "https://schema.org", "@type": "Person", name: "Анна Дмитриевна Кудрявцева", jobTitle: "Стоматолог",
-    image: SITE_URL + "/assets/img/kudryavtseva-860.jpg", url: `${SITE_URL}/about.html`, knowsAbout: SPECS,
+    image: SITE_URL + "/assets/img/kudryavtseva-front-860.jpg", url: `${SITE_URL}/about.html`, knowsAbout: SPECS,
   })}</script>${crumbsLd([{ name: "О докторе", path: "about.html" }])}`,
   body: (p) => `
 <section class="page-hero">
   <div class="container about-hero">
     <figure class="portrait-frame">
-      <div class="frame">${portrait(p, { eager: true, sizes: "(max-width: 760px) 84vw, 440px" })}</div>
+      <div class="frame">${portrait(p, { photo: "hand", eager: true, sizes: "(max-width: 760px) 84vw, 440px" })}</div>
       ${nameplate()}
     </figure>
     <div class="detail-copy hero-anim">
@@ -546,7 +552,7 @@ ${QUAL.length ? `<section class="section">
   <div class="container">
     <div class="section-head"><div><span class="eyebrow">Квалификация</span><h2>Образование и опыт</h2></div></div>
     <div class="cards-3" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))">
-      ${QUAL.map(([k, t, i]) => `<div class="panel" data-reveal><h3>${ic(i)}${t}</h3><ul class="qual-list">${ABOUT[k].map((r) => `<li>${r.year ? `<span class="y">${r.year}</span>` : "<span></span>"}<span>${r.text}</span></li>`).join("")}</ul></div>`).join("")}
+      ${QUAL.map(([k, t, i]) => `<div class="panel" data-reveal><h3>${ic(i)}${t}</h3><ul class="qual-list">${ABOUT[k].map((r) => `<li>${r.year ? `<span class="y">${r.year}</span>` : "<span></span>"}<span class="t">${r.text}</span></li>`).join("")}</ul></div>`).join("")}
     </div>
   </div>
 </section>` : ""}
