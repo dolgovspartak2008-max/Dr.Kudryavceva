@@ -8,7 +8,7 @@ window.SITE_CONFIG = {
   telegram: "https://t.me/Kudryavceva_Anna",       // личные сообщения (@Kudryavceva_Anna)
   telegramChannel: "https://t.me/Dr_Vesnushka",   // Telegram-канал
   whatsapp: "https://wa.me/message/4WHPSEJDVZBKL1",
-  waNumber: "",         // необязательно: номер для WhatsApp (79001234567) — тогда текст заявки подставится в чат сам; на сайте не показывается
+  waNumber: "79999100009",         // необязательно: номер для WhatsApp (79001234567) — тогда текст заявки подставится в чат сам; на сайте не показывается
   email: "",
   address: "",          // город, улица, дом, кабинет
   hours: "",            // например "Пн–Пт 10:00–20:00"
