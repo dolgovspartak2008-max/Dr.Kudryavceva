@@ -13,6 +13,7 @@
  *               "confirmed" — доктор подтвердил порядок: тогда укажите before и after
  *   before    — номер фото «до» в массиве photos (с нуля), только при order: "confirmed"
  *   after     — номер фото «после», только при order: "confirmed"
+ *   labels    — подписи к фото по порядку (необязательно), например ["До", "В процессе", "После"]
  *
  * Пример:
  * {
@@ -28,4 +29,19 @@
  * },
  */
 window.CASES = [
+  {
+    id: "restavraciya-01",
+    category: "restavraciya",
+    title: "Восстановление жевательных зубов",
+    text: "Лечение в коффердаме: исходная ситуация, этап восстановления и финальный результат.",
+    photos: [
+      { src: "assets/img/cases/restavraciya-01-1-do.webp", alt: "Жевательные зубы до восстановления, в коффердаме" },
+      { src: "assets/img/cases/restavraciya-01-2-process.webp", alt: "Жевательные зубы в процессе восстановления" },
+      { src: "assets/img/cases/restavraciya-01-3-posle.webp", alt: "Жевательные зубы после восстановления, финальный результат" }
+    ],
+    labels: ["До", "В процессе", "После"],
+    order: "confirmed",
+    before: 0,
+    after: 2
+  }
 ];

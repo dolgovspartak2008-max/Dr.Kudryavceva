@@ -76,16 +76,12 @@
     <div class="booking-card" data-reveal>
       <div class="booking-intro">
         <h2 id="cases-title">Запишитесь на приём</h2>
-        <p>Получите консультацию и индивидуальный план лечения. Оставьте контакты — вам перезвонят, чтобы подобрать время визита.</p>
+        <p>Получите консультацию и индивидуальный план лечения. Заполните форму — откроется WhatsApp, где вам подберут время визита.</p>
       </div>
       <form class="form form--dark" data-booking novalidate>
     <div class="form-grid"><div class="field">
         <label for="cases-name">Ваше имя</label>
         <div class="input-wrap"><svg class="icon " aria-hidden="true"><use href="#i-user"></use></svg><input id="cases-name" name="name" type="text" autocomplete="name" placeholder="Как к вам обращаться" maxlength="80" required></div>
-        <span class="field-error" aria-live="polite"></span>
-      </div><div class="field">
-        <label for="cases-phone">Телефон</label>
-        <div class="input-wrap"><svg class="icon " aria-hidden="true"><use href="#i-phone"></use></svg><input id="cases-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" required></div>
         <span class="field-error" aria-live="polite"></span>
       </div><div class="field">
         <label for="cases-service">Услуга</label>
@@ -99,7 +95,7 @@
     <div class="hp" aria-hidden="true"><label for="cases-website">Не заполняйте это поле</label><input id="cases-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
     <div class="form-foot">
       <label class="check"><input id="cases-consent" type="checkbox" name="consent" required><span>Даю <a href="consent.html">согласие на обработку персональных данных</a> и принимаю <a href="privacy.html">политику конфиденциальности</a><span class="field-error" aria-live="polite"></span></span></label>
-      <button class="btn btn--primary" type="submit">Записаться <svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></button>
+      <button class="btn btn--primary" type="submit"><svg class="icon " aria-hidden="true"><use href="#i-chat"></use></svg>Записаться в WhatsApp</button>
     </div>
     <p class="form-status" role="status" aria-live="polite" hidden></p>
   </form>

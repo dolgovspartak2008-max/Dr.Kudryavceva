@@ -449,17 +449,14 @@ body.menu-open { overflow: hidden; }
 
 .cases-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .case-card { position: relative; display: grid; grid-template-columns: 1fr; gap: 12px; align-items: stretch; padding: 10px; border-radius: var(--radius); background: var(--white); border: 1px solid var(--line); min-width: 0; box-shadow: 0 10px 24px -22px rgba(58,40,27,.5); }
-.case-media { position: relative; border-radius: 14px; overflow: hidden; background: var(--ivory); aspect-ratio: 4 / 3; }
+.case-media { position: relative; border-radius: 14px; overflow: hidden; background: var(--ivory); aspect-ratio: 1 / 1; }
 .case-pair { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; height: 100%; }
 .case-pair button { position: relative; padding: 0; border: 0; background: var(--ivory); cursor: zoom-in; display: block; height: 100%; min-width: 0; border-radius: 10px; overflow: hidden; }
 .case-pair img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
 .case-pair button:hover img { transform: scale(1.04); }
 .badge { position: absolute; left: 8px; bottom: 8px; padding: 3px 10px; border-radius: 999px; font-size: .72rem; font-weight: 600; background: rgba(255, 255, 255, .94); color: var(--cocoa); pointer-events: none; }
 .case-info { display: grid; align-content: center; gap: 6px; padding: 2px 54px 8px 6px; min-width: 0; }
-@media (min-width: 1200px) {
-  .case-card { grid-template-columns: minmax(0, 58%) minmax(0, 1fr); gap: 16px; }
-  .case-info { padding: 8px 46px 8px 0; }
-}
+
 .case-info .cat { font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-deep); font-weight: 700; }
 .case-info h3 { font-size: 1.15rem; line-height: 1.25; }
 .case-info p { font-size: .86rem; color: var(--muted); }

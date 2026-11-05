@@ -173,15 +173,15 @@ function bookingForm(p, id, { dark = false, selected = "", comment = false } = {
         <span class="field-error" aria-live="polite"></span>
       </div>`;
   return `<form class="form${dark ? " form--dark" : ""}" data-booking novalidate>
-    ${comment ? `<div class="form-grid form-grid--2">${name}${phone}</div>${service}` : `<div class="form-grid">${name}${phone}${service}</div>`}
+    ${comment ? `<div class="form-grid form-grid--2">${name}${service}</div>` : `<div class="form-grid">${name}${service}</div>`}
     ${comment ? `<div class="field">
       <label for="${id}-comment">Комментарий <span class="muted">(необязательно)</span></label>
-      <textarea id="${id}-comment" name="comment" rows="3" maxlength="1000" placeholder="Что беспокоит, удобное время для звонка"></textarea>
+      <textarea id="${id}-comment" name="comment" rows="3" maxlength="1000" placeholder="Что беспокоит, удобные дни и время"></textarea>
     </div>` : ""}
     <div class="hp" aria-hidden="true"><label for="${id}-website">Не заполняйте это поле</label><input id="${id}-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
     <div class="form-foot">
       <label class="check"><input id="${id}-consent" type="checkbox" name="consent" required><span>Даю <a href="${p}consent.html">согласие на обработку персональных данных</a> и принимаю <a href="${p}privacy.html">политику конфиденциальности</a><span class="field-error" aria-live="polite"></span></span></label>
-      <button class="btn btn--primary" type="submit">Записаться ${ic("i-arrow")}</button>
+      <button class="btn btn--primary" type="submit">${ic("i-chat")}Записаться в WhatsApp</button>
     </div>
     <p class="form-status" role="status" aria-live="polite" hidden></p>
   </form>`;
@@ -193,7 +193,7 @@ function bookingBand(p, id, selected = "") {
     <div class="booking-card" data-reveal>
       <div class="booking-intro">
         <h2 id="${id}-title">Запишитесь на приём</h2>
-        <p>Получите консультацию и индивидуальный план лечения. Оставьте контакты — вам перезвонят, чтобы подобрать время визита.</p>
+        <p>Получите консультацию и индивидуальный план лечения. Заполните форму — откроется WhatsApp, где вам подберут время визита.</p>
       </div>
       ${bookingForm(p, id, { dark: true, selected })}
     </div>
@@ -631,7 +631,7 @@ pages.push({
     ${crumbs(p, [{ label: "Контакты" }])}
     <span class="eyebrow">Контакты</span>
     <h1>Контакты и запись</h1>
-    <p class="lead">Оставьте заявку на сайте или свяжитесь напрямую — вам помогут подобрать удобное время консультации.</p>
+    <p class="lead">Заполните форму — откроется WhatsApp с готовым сообщением. Или напишите напрямую в удобный мессенджер.</p>
   </div>
 </section>
 <section class="section section--flush-top">
@@ -649,8 +649,8 @@ pages.push({
       <div class="panel">
         <h3>${ic("i-calendar")}Как проходит запись</h3>
         <ol class="how-book" style="list-style:none">
-          <li><span class="step-num">1</span><span>Вы оставляете заявку или пишете в удобный мессенджер.</span></li>
-          <li><span class="step-num">2</span><span>Вам перезванивают и подбирают время консультации.</span></li>
+          <li><span class="step-num">1</span><span>Вы заполняете форму на сайте — открывается WhatsApp, или пишете в удобный мессенджер сами.</span></li>
+          <li><span class="step-num">2</span><span>Вам отвечают и подбирают удобное время консультации.</span></li>
           <li><span class="step-num">3</span><span>На приёме врач проводит диагностику и предлагает план лечения.</span></li>
         </ol>
       </div>

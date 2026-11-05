@@ -189,57 +189,36 @@
       ev.preventDefault();
       var f = form.elements;
       var name = f.name.value.trim();
-      var digits = f.phone.value.replace(/\D/g, "");
       var ok = true;
       if (name.length < 2 || !/[A-Za-zА-Яа-яЁё]/.test(name)) { setErr(f.name, "Укажите, как к вам обращаться"); ok = false; } else setErr(f.name);
-      if (digits.length !== 11 || digits.charAt(1) === "0") { setErr(f.phone, "Введите номер полностью: +7 и 10 цифр"); ok = false; } else setErr(f.phone);
       if (f.service && !f.service.value) { setErr(f.service, "Выберите услугу или «Не знаю»"); ok = false; } else if (f.service) setErr(f.service);
-      if (f.consent && !f.consent.checked) { setErr(f.consent, "Отметьте согласие, чтобы отправить заявку"); ok = false; } else if (f.consent) setErr(f.consent);
+      if (f.consent && !f.consent.checked) { setErr(f.consent, "Отметьте согласие, чтобы продолжить"); ok = false; } else if (f.consent) setErr(f.consent);
       if (!ok) { var bad = form.querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
+      if (f.website && f.website.value) return; // бот
 
-      var endpoint = val("formEndpoint");
-      if (!endpoint) {
-        show("is-err", "Онлайн-запись пока не подключена — заявка не отправлена." + contactsHtml());
-        return;
-      }
-      var payload = {
-        name: name,
-        phone: "+" + digits,
-        service: f.service ? f.service.options[f.service.selectedIndex].text : "",
-        comment: f.comment ? f.comment.value.trim() : "",
-        website: f.website ? f.website.value : "",
-        page: location.pathname
+      var wa = val("whatsapp");
+      if (!wa) { show("is-err", "Запись через WhatsApp пока недоступна." + contactsHtml()); return; }
+      var service = f.service ? f.service.options[f.service.selectedIndex].text : "";
+      var comment = f.comment ? f.comment.value.trim() : "";
+      var text = "Здравствуйте, Анна Дмитриевна! Хочу записаться на приём.\n" +
+        "Имя: " + name + (service ? "\nУслуга: " + service : "") + (comment ? "\nКомментарий: " + comment : "");
+
+      // Ссылка-визитка wa.me/message/… не принимает текст, поэтому текст заявки копируется в буфер обмена.
+      // Если указан номер (waNumber), текст подставляется в чат автоматически.
+      var num = val("waNumber").replace(/\D/g, "");
+      var url = num ? "https://wa.me/" + num + "?text=" + encodeURIComponent(text) : wa;
+      var win = window.open(url, "_blank");
+      if (win) { try { win.opener = null; } catch (e) {} } else { location.href = url; }
+      var done = function (copied) {
+        show("is-ok", num
+          ? "Открываем WhatsApp — отправьте подготовленное сообщение, и вам ответят, чтобы подобрать время приёма."
+          : (copied ? "Открываем WhatsApp. Текст заявки скопирован — вставьте его в чат и отправьте." : "Открываем WhatsApp — напишите имя и услугу, и вам ответят, чтобы подобрать время приёма.") +
+            ' Если WhatsApp не открылся, <a href="' + esc(wa) + '" target="_blank" rel="noopener">нажмите сюда</a>.');
+        form.reset();
       };
-      busy(true);
-      if (status) status.hidden = true;
-      var ctrl = "AbortController" in window ? new AbortController() : null;
-      var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 15000);
-      fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify(payload),
-        signal: ctrl ? ctrl.signal : undefined
-      })
-        .then(function (r) {
-          return r.json().catch(function () { return {}; }).then(function (data) { return { status: r.status, ok: r.ok, data: data }; });
-        })
-        .then(function (res) {
-          clearTimeout(timer); busy(false);
-          if (res.ok && res.data && res.data.ok) {
-            show("is-ok", "Спасибо, " + esc(name) + "! Заявка отправлена. Вам перезвонят, чтобы подобрать время приёма.");
-            form.reset();
-          } else if (res.status === 503) {
-            show("is-err", "Онлайн-запись временно недоступна — заявка не отправлена." + contactsHtml());
-          } else if (res.status === 400) {
-            show("is-err", "Проверьте, пожалуйста, имя и номер телефона и отправьте ещё раз.");
-          } else {
-            show("is-err", "Не удалось отправить заявку." + contactsHtml());
-          }
-        })
-        .catch(function () {
-          clearTimeout(timer); busy(false);
-          show("is-err", "Не удалось отправить заявку: нет связи с сервером. Проверьте интернет и попробуйте ещё раз." + (val("phone") ? contactsHtml() : ""));
-        });
+      if (!num && navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+      } else done(false);
     });
   });
 
@@ -268,7 +247,8 @@
 
   function caseCard(c) {
     var idx = cases.indexOf(c);
-    var note = isConfirmed(c) ? "" : '<span class="stage-note">Этапы лечения · ' + c.photos.length + " фото</span>";
+    var note = !isConfirmed(c) ? '<span class="stage-note">Этапы лечения · ' + c.photos.length + " фото</span>"
+      : c.photos.length > 2 ? '<span class="stage-note">' + c.photos.length + " фото: " + esc((c.labels || []).join(" → ").toLowerCase()) + "</span>" : "";
     return '<article class="case-card" data-reveal>' +
       '<div class="case-media">' + caseMedia(c, idx) + "</div>" +
       '<div class="case-info"><span class="cat">' + esc(CATEGORIES[c.category] || "") + "</span>" +
@@ -390,7 +370,8 @@
     var conf = isConfirmed(c);
     var bi = c.before != null ? c.before : 0, ai = c.after != null ? c.after : 1;
     lbList = c.photos.map(function (p, i) {
-      return { src: p.src, alt: p.alt, label: conf ? (i === bi ? "До" : i === ai ? "После" : "") : "" };
+      var lbl = c.labels && c.labels[i] ? c.labels[i] : (conf ? (i === bi ? "До" : i === ai ? "После" : "") : "");
+      return { src: p.src, alt: p.alt, label: lbl };
     });
     lightbox.hidden = false; document.body.classList.add("menu-open");
     showLb(parseInt(t.getAttribute("data-lb-i") || "0", 10));

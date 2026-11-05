@@ -61,7 +61,7 @@
     <nav class="breadcrumbs" aria-label="Хлебные крошки"><ol><li><a href="./">Главная</a></li><li aria-current="page">Контакты</li></ol></nav>
     <span class="eyebrow">Контакты</span>
     <h1>Контакты и запись</h1>
-    <p class="lead">Оставьте заявку на сайте или свяжитесь напрямую — вам помогут подобрать удобное время консультации.</p>
+    <p class="lead">Заполните форму — откроется WhatsApp с готовым сообщением. Или напишите напрямую в удобный мессенджер.</p>
   </div>
 </section>
 <section class="section section--flush-top">
@@ -79,8 +79,8 @@
       <div class="panel">
         <h3><svg class="icon " aria-hidden="true"><use href="#i-calendar"></use></svg>Как проходит запись</h3>
         <ol class="how-book" style="list-style:none">
-          <li><span class="step-num">1</span><span>Вы оставляете заявку или пишете в удобный мессенджер.</span></li>
-          <li><span class="step-num">2</span><span>Вам перезванивают и подбирают время консультации.</span></li>
+          <li><span class="step-num">1</span><span>Вы заполняете форму на сайте — открывается WhatsApp, или пишете в удобный мессенджер сами.</span></li>
+          <li><span class="step-num">2</span><span>Вам отвечают и подбирают удобное время консультации.</span></li>
           <li><span class="step-num">3</span><span>На приёме врач проводит диагностику и предлагает план лечения.</span></li>
         </ol>
       </div>
@@ -96,25 +96,21 @@
         <div class="input-wrap"><svg class="icon " aria-hidden="true"><use href="#i-user"></use></svg><input id="contact-name" name="name" type="text" autocomplete="name" placeholder="Как к вам обращаться" maxlength="80" required></div>
         <span class="field-error" aria-live="polite"></span>
       </div><div class="field">
-        <label for="contact-phone">Телефон</label>
-        <div class="input-wrap"><svg class="icon " aria-hidden="true"><use href="#i-phone"></use></svg><input id="contact-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" required></div>
-        <span class="field-error" aria-live="polite"></span>
-      </div></div><div class="field">
         <label for="contact-service">Услуга</label>
         <div class="input-wrap"><svg class="icon " aria-hidden="true"><use href="#i-tooth"></use></svg><select id="contact-service" name="service" required><option value="">Выберите услугу</option>
       <option value="konsultaciya">Консультация и диагностика</option>
       <option value="esteticheskaya-restavraciya">Эстетическая реставрация зубов</option><option value="slozhnoe-perelechivanie">Сложное перелечивание зубов</option><option value="protezirovanie">Протезирование зубов</option><option value="implantaciya">Имплантация</option><option value="kostnaya-plastika">Костные пластики</option><option value="udalenie-zubov-mudrosti">Удаление зубов мудрости</option>
       <option value="ne-znayu">Не знаю, нужна консультация врача</option></select></div>
         <span class="field-error" aria-live="polite"></span>
-      </div>
+      </div></div>
     <div class="field">
       <label for="contact-comment">Комментарий <span class="muted">(необязательно)</span></label>
-      <textarea id="contact-comment" name="comment" rows="3" maxlength="1000" placeholder="Что беспокоит, удобное время для звонка"></textarea>
+      <textarea id="contact-comment" name="comment" rows="3" maxlength="1000" placeholder="Что беспокоит, удобные дни и время"></textarea>
     </div>
     <div class="hp" aria-hidden="true"><label for="contact-website">Не заполняйте это поле</label><input id="contact-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
     <div class="form-foot">
       <label class="check"><input id="contact-consent" type="checkbox" name="consent" required><span>Даю <a href="consent.html">согласие на обработку персональных данных</a> и принимаю <a href="privacy.html">политику конфиденциальности</a><span class="field-error" aria-live="polite"></span></span></label>
-      <button class="btn btn--primary" type="submit">Записаться <svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></button>
+      <button class="btn btn--primary" type="submit"><svg class="icon " aria-hidden="true"><use href="#i-chat"></use></svg>Записаться в WhatsApp</button>
     </div>
     <p class="form-status" role="status" aria-live="polite" hidden></p>
   </form>
