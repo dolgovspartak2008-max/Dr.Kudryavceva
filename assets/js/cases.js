@@ -85,11 +85,9 @@ window.CASES = [
     title: "Фронтальные зубы",
     text: "",
     photos: [
-      { src: "assets/img/cases/restavraciya-02-1.webp", alt: "Фронтальные зубы верхней челюсти" },
-      { src: "assets/img/cases/restavraciya-02-2.webp", alt: "Улыбка, фронтальные зубы" },
-      { src: "assets/img/cases/restavraciya-02-3.webp", alt: "Фронтальные зубы в коффердаме" }
+      { src: "assets/img/cases/restavraciya-02-1.webp", alt: "Улыбка, фронтальные зубы" },
+      { src: "assets/img/cases/restavraciya-02-2.webp", alt: "Фронтальные зубы крупным планом" }
     ],
-    ratio: "3 / 2",
     order: "unknown"
   }
 ];
