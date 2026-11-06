@@ -71,11 +71,11 @@ window.CASES = [
   {
     id: "protezirovanie-02",
     category: "protezirovanie",
-    title: "Коронки",
+    title: "Перелечивание зубов и циркониевые коронки",
     text: "",
     photos: [
-      { src: "assets/img/cases/protezirovanie-02-1.webp", alt: "Коронки на жевательных зубах" },
-      { src: "assets/img/cases/protezirovanie-02-2.webp", alt: "Рентгеновский снимок зубов с коронками" }
+      { src: "assets/img/cases/protezirovanie-02-1.webp", alt: "Циркониевые коронки на жевательных зубах" },
+      { src: "assets/img/cases/protezirovanie-02-2.webp", alt: "Рентгеновский снимок: перелеченные каналы и циркониевые коронки" }
     ],
     order: "unknown"
   },
