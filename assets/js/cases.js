@@ -85,8 +85,8 @@ window.CASES = [
     title: "Фронтальные зубы",
     text: "",
     photos: [
-      { src: "assets/img/cases/restavraciya-02-1.webp", alt: "Улыбка, фронтальные зубы" },
-      { src: "assets/img/cases/restavraciya-02-2.webp", alt: "Фронтальные зубы крупным планом" }
+      { src: "assets/img/cases/restavraciya-02-smile.webp", alt: "Улыбка, фронтальные зубы" },
+      { src: "assets/img/cases/restavraciya-02-closeup.webp", alt: "Фронтальные зубы крупным планом" }
     ],
     order: "unknown"
   }
