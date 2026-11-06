@@ -4,7 +4,7 @@ import { writeFileSync, mkdirSync, readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { SPECS, PERKS, STEPS, SERVICES, ABOUT } from "./content.mjs";
+import { SPECS, PERKS, STEPS, SERVICES, ABOUT, DOCS } from "./content.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -632,6 +632,18 @@ ${QUAL.length ? `<section class="section">
     <div class="section-head"><div><span class="eyebrow">Квалификация</span><h2>Образование и опыт</h2></div></div>
     <div class="cards-3" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))">
       ${QUAL.map(([k, t, i]) => `<div class="panel" data-reveal><h3>${ic(i)}${t}</h3><ul class="qual-list">${ABOUT[k].map((r) => `<li>${r.year ? `<span class="y">${r.year}</span>` : "<span></span>"}<span class="t">${r.text}</span></li>`).join("")}</ul></div>`).join("")}
+    </div>
+  </div>
+</section>` : ""}
+
+${DOCS.length ? `<section class="section section--ivory" id="dokumenty" aria-labelledby="docs-title">
+  <div class="container">
+    <div class="section-head"><div><span class="eyebrow">Документы</span><h2 id="docs-title">Дипломы и сертификаты</h2><p class="lead">Сканы оригиналов документов. Нажмите на документ, чтобы рассмотреть его в полном размере.</p></div></div>
+    <div class="docs-grid">
+      ${DOCS.map((d, i) => `<button type="button" class="doc-card" data-reveal data-doc="${i}" data-title="${d.title}" data-pages="${d.files.map((f) => `assets/img/docs/${f}.webp`).join("|")}" aria-label="${d.title} — открыть в полном размере">
+        <span class="doc-media"><img src="${p}assets/img/docs/${d.files[0]}-720.webp" alt="${d.title}" loading="lazy" decoding="async">${d.files.length > 1 ? `<span class="doc-pages">${d.files.length} стр.</span>` : ""}</span>
+        <span class="doc-info"><b>${d.title}</b><span>${d.note}</span></span>
+      </button>`).join("")}
     </div>
   </div>
 </section>` : ""}

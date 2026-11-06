@@ -788,3 +788,27 @@ a.contact-item:hover { border-color: var(--gold-light); box-shadow: var(--shadow
 @media (max-width: 1100px) and (min-width: 981px) { .perk { gap: 12px; padding: 18px 16px; } .perk .icon { width: 30px; height: 30px; } }
 @media (max-width: 860px) { .portrait-frame::before { inset: -12px; border-radius: 250px 250px 30px 30px; } }
 @media (max-width: 359px) { .specs li { font-size: .875rem; } }
+
+/* ---------- Дипломы и сертификаты ---------- */
+.docs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 20px; }
+.doc-card { display: grid; grid-template-rows: auto 1fr; gap: 12px; padding: 10px; border-radius: var(--radius); background: var(--white); border: 1px solid var(--line); text-align: left; font: inherit; color: inherit; cursor: zoom-in; min-width: 0; box-shadow: 0 10px 24px -22px rgba(58,40,27,.5); transition: transform .3s ease, box-shadow .3s ease, border-color .3s; }
+.doc-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--gold-light); }
+.doc-media { position: relative; display: grid; place-items: center; aspect-ratio: 4 / 3; padding: 10px; border-radius: 12px; background: var(--ivory); overflow: hidden; }
+.doc-media img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; box-shadow: 0 6px 16px -8px rgba(58,40,27,.45); transition: transform .5s ease; }
+.doc-card:hover .doc-media img { transform: scale(1.03); }
+.doc-pages { position: absolute; right: 8px; bottom: 8px; padding: 3px 9px; border-radius: 999px; background: rgba(58,40,27,.72); color: var(--milk); font-size: .72rem; font-weight: 600; }
+.doc-info { display: grid; gap: 4px; padding: 0 6px 6px; align-content: start; }
+.doc-info b { font-weight: 600; line-height: 1.35; color: var(--cocoa); }
+.doc-info span { font-size: .84rem; line-height: 1.45; color: var(--muted); }
+.lightbox-stage img[src*="/docs/"] { background: #fff; }
+.lightbox-stage img { position: absolute; inset: 0; margin: auto; }
+@media (max-width: 560px) {
+  .docs-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .doc-card { padding: 6px; gap: 8px; }
+  .doc-media { padding: 6px; border-radius: 10px; }
+  .doc-info { padding: 0 4px 4px; }
+  .doc-info b { font-size: .86rem; }
+  .doc-info span { font-size: .75rem; }
+}
+.doc-media img { position: absolute; inset: 0; margin: auto; max-width: calc(100% - 20px); max-height: calc(100% - 20px); }
+@media (max-width: 560px) { .doc-media img { max-width: calc(100% - 12px); max-height: calc(100% - 12px); } }

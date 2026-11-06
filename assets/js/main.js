@@ -359,7 +359,7 @@
     lbIndex = (i + lbList.length) % lbList.length;
     var ph = lbList[lbIndex], img = lightbox.querySelector("img");
     img.src = src(ph); img.alt = ph.alt || lbTitle;
-    lightbox.querySelector(".lb-title").textContent = lbTitle + (ph.label ? " · " + ph.label : "");
+    lightbox.querySelector(".lb-title").textContent = [ph.title || lbTitle, ph.label].filter(Boolean).join(" · ");
     lightbox.querySelector(".lb-count").textContent = (lbIndex + 1) + " / " + lbList.length;
     var multi = lbList.length > 1;
     lightbox.querySelector(".lb-prev").hidden = !multi;
@@ -369,11 +369,29 @@
     lightbox.hidden = true; document.body.classList.remove("menu-open");
     if (lbReturn) lbReturn.focus();
   }
+  // Дипломы и сертификаты: все документы листаются подряд, у многостраничных — номер страницы.
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-doc]"); if (!t) return;
+    if (!lightbox) lightbox = buildLightbox();
+    lbReturn = t; lbTitle = ""; lbList = []; var start = 0;
+    $$("[data-doc]").forEach(function (d) {
+      var pages = d.getAttribute("data-pages").split("|"), title = d.getAttribute("data-title");
+      if (d === t) start = lbList.length;
+      pages.forEach(function (pg, i) {
+        lbList.push({ src: pg, alt: title, title: title, label: pages.length > 1 ? "стр. " + (i + 1) + " из " + pages.length : "" });
+      });
+    });
+    lightbox.setAttribute("aria-label", "Просмотр документов");
+    lightbox.hidden = false; document.body.classList.add("menu-open");
+    showLb(start);
+    lightbox.querySelector(".lb-close").focus();
+  });
+
   document.addEventListener("click", function (e) {
     var t = e.target.closest("[data-lb]"); if (!t) return;
     var c = cases[parseInt(t.getAttribute("data-lb"), 10)]; if (!c) return;
     if (!lightbox) lightbox = buildLightbox();
-    lbReturn = t; lbTitle = c.title;
+    lbReturn = t; lbTitle = c.title; lightbox.setAttribute("aria-label", "Просмотр фотографий");
     var conf = isConfirmed(c);
     var bi = c.before != null ? c.before : 0, ai = c.after != null ? c.after : 1;
     lbList = c.photos.map(function (p, i) {
