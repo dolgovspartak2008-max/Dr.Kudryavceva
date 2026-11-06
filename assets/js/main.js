@@ -263,7 +263,8 @@
     return '<article class="case-row" data-reveal>' +
       '<div class="case-info"><span class="cat">' + esc(CATEGORIES[c.category] || "") + "</span>" +
       "<h3>" + esc(nb(c.title)) + "</h3>" + (c.text ? "<p>" + esc(nb(c.text)) + "</p>" : "") + "</div>" +
-      '<div class="case-photos" style="--n:' + c.photos.length + '">' + photos + "</div></article>";
+      '<div class="case-photos' + (c.photos.length === 1 ? " is-single" : "") + '" style="--n:' + c.photos.length +
+      (c.ratio && /^[\d.\s\/]+$/.test(c.ratio) ? ";--ratio:" + c.ratio : "") + '">' + photos + "</div></article>";
   }
 
   function renderCases(root) {

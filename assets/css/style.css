@@ -763,8 +763,9 @@ a.contact-item:hover { border-color: var(--gold-light); box-shadow: var(--shadow
 .case-row .case-info h3 { font-size: clamp(1.25rem, 1.15rem + .4vw, 1.5rem); line-height: 1.22; }
 .case-row .case-info p { font-size: var(--fs-sm); line-height: 1.6; }
 .case-photos { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 10px; }
+.case-photos.is-single { max-width: 520px; }
 .case-photo { margin: 0; display: grid; gap: 10px; min-width: 0; }
-.case-photo button { width: 100%; padding: 0; border: 0; background: var(--ivory); border-radius: var(--radius-sm); overflow: hidden; cursor: zoom-in; aspect-ratio: 3 / 4; display: block; }
+.case-photo button { width: 100%; padding: 0; border: 0; background: var(--ivory); border-radius: var(--radius-sm); overflow: hidden; cursor: zoom-in; aspect-ratio: var(--ratio, 3 / 4); display: block; }
 .case-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
 .case-photo button:hover img { transform: scale(1.04); }
 .case-photo figcaption { text-align: center; font-size: .75rem; line-height: 1.4; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--gold-deep); }
@@ -776,6 +777,7 @@ a.contact-item:hover { border-color: var(--gold-light); box-shadow: var(--shadow
 }
 .service-art.has-img::after { display: none; }
 .cases-note { display: flex; gap: 10px; align-items: flex-start; margin-top: 20px; font-size: var(--fs-xs); line-height: 1.5; }
+.cases-more { margin-top: 18px; }
 .cases-note .icon { width: 18px; height: 18px; flex: none; color: var(--gold); }
 @media (max-width: 760px) { .perk span br { display: none; } .perk span { max-width: 100%; } }
 @media (max-width: 860px) { .perks-wrap { margin-top: -44px; } }

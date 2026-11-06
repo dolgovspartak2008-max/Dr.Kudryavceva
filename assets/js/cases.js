@@ -14,6 +14,7 @@
  *   before    — номер фото «до» в массиве photos (с нуля), только при order: "confirmed"
  *   after     — номер фото «после», только при order: "confirmed"
  *   labels    — подписи к фото по порядку (необязательно), например ["До", "В процессе", "После"]
+ *   ratio     — пропорции превью (необязательно, по умолчанию "3 / 4"), например "3 / 2" для горизонтальных фото
  *
  * Пример:
  * {
@@ -43,5 +44,52 @@ window.CASES = [
     order: "confirmed",
     before: 0,
     after: 2
+  },
+  {
+    id: "implantaciya-01",
+    category: "implantaciya",
+    title: "Имплантация жевательного зуба",
+    text: "",
+    photos: [
+      { src: "assets/img/cases/implantaciya-01-1.webp", alt: "Отсутствующий жевательный зуб, исходная ситуация" },
+      { src: "assets/img/cases/implantaciya-01-2.webp", alt: "Установленный имплант" },
+      { src: "assets/img/cases/implantaciya-01-3.webp", alt: "Формирователь десны и швы после имплантации" }
+    ],
+    order: "unknown"
+  },
+  {
+    id: "protezirovanie-01",
+    category: "protezirovanie",
+    title: "Циркониевые коронки",
+    text: "",
+    photos: [
+      { src: "assets/img/cases/protezirovanie-01-1.webp", alt: "Циркониевые коронки на жевательные зубы" }
+    ],
+    ratio: "5 / 4",
+    order: "unknown"
+  },
+  {
+    id: "protezirovanie-02",
+    category: "protezirovanie",
+    title: "Коронки",
+    text: "",
+    photos: [
+      { src: "assets/img/cases/protezirovanie-02-1.webp", alt: "Коронки на жевательных зубах" },
+      { src: "assets/img/cases/protezirovanie-02-2.webp", alt: "Рентгеновский снимок зубов с коронками" }
+    ],
+    order: "unknown"
+  },
+  {
+    id: "restavraciya-02",
+    category: "restavraciya",
+    title: "Фронтальные зубы",
+    text: "",
+    photos: [
+      { src: "assets/img/cases/restavraciya-02-1.webp", alt: "Фронтальные зубы верхней челюсти" },
+      { src: "assets/img/cases/restavraciya-02-2.webp", alt: "Улыбка, фронтальные зубы" },
+      { src: "assets/img/cases/restavraciya-02-3.webp", alt: "Фронтальные зубы в коффердаме" }
+    ],
+    ratio: "3 / 2",
+    order: "unknown"
   }
 ];

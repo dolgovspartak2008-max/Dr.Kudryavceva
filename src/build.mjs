@@ -416,6 +416,7 @@ pages.push({
   <div class="container">
     <div class="section-head"><div><span class="eyebrow">Примеры работ</span><h2 id="cases-title">Примеры лечения</h2></div></div>
     <div class="case-list" data-cases></div>
+    <p class="cases-more" data-cfg="telegramChannel" data-cfg-mode="show" hidden><a class="link-arrow" data-cfg="telegramChannel" data-cfg-keep-text href="#"><span>А больше работ — в моём Telegram-канале</span>${ic("i-arrow")}</a></p>
   </div>
 </section>
 
@@ -660,6 +661,7 @@ pages.push({
   <div class="container">
     <div class="filters" data-case-filters role="group" aria-label="Категории работ" hidden></div>
     <div class="case-list" data-cases data-category="all" aria-live="polite"></div>
+    <p class="cases-more" data-cfg="telegramChannel" data-cfg-mode="show" hidden><a class="link-arrow" data-cfg="telegramChannel" data-cfg-keep-text href="#"><span>А больше работ — в моём Telegram-канале</span>${ic("i-arrow")}</a></p>
     <p class="muted cases-note" data-cases-note hidden>${ic("i-info")}<span>Фотографии публикуются без ретуши. Результат лечения индивидуален.</span></p>
   </div>
 </section>
