@@ -209,6 +209,7 @@ body.menu-open { overflow: hidden; }
 .hero-copy > .eyebrow { line-height: 1.7; }
 .hero-copy h1 { font-size: var(--step-5); line-height: 1.04; letter-spacing: -.015em; margin-top: -4px; }
 .hero-copy h1 span { display: block; }
+.hero-name { margin: 12px 0 0; font-family: var(--f-display); font-size: var(--step-3, 1.75rem); line-height: 1.15; color: var(--gold-deep); letter-spacing: .01em; }
 .hero-copy .btn-row { margin-top: 8px; }
 .specs { list-style: none; margin: 0; padding: 2px 0 2px 20px; border-left: 1.5px solid var(--gold); display: grid; gap: 6px; }
 .specs li { font-size: var(--step-0); color: var(--cocoa); line-height: 1.45; }
@@ -629,7 +630,9 @@ a.contact-item:hover { border-color: var(--gold-light); box-shadow: var(--shadow
   .hero-arc { left: -70%; top: -18%; width: 150%; }
   .hero-copy { display: contents; }
   .hero-copy > .eyebrow { display: none; }
-  .hero-copy h1 { order: 1; font-size: clamp(2.25rem, 1.6rem + 3vw, 3rem); margin-top: 0; }
+  .hero-copy .hero-title { order: 1; }
+  .hero-copy h1 { font-size: clamp(2.25rem, 1.6rem + 3vw, 3rem); margin-top: 0; }
+  .hero-name { margin-top: 6px; font-size: clamp(1.25rem, 1rem + 1.2vw, 1.5rem); }
   .hero-photo { order: 2; position: relative; inset: auto; width: 100%; max-width: 440px; align-self: center; aspect-ratio: 1 / 1.05; border-radius: var(--radius-lg); overflow: hidden; -webkit-mask-image: none; mask-image: none; box-shadow: 0 30px 50px -36px rgba(58,40,27,.7); }
   .hero-photo picture { padding: 0; }
   .hero-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; -webkit-mask-image: none; mask-image: none; }

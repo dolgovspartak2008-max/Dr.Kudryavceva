@@ -301,7 +301,8 @@ html.intro-leave body>:not(.intro){opacity:1}
 .intro .i-ring.back{opacity:.75;animation:iDraw .7s 1.05s ease-out forwards}
 .intro .i-ring.front{animation:iDraw .7s 1.35s ease-out forwards}
 .intro .i-star{transform-box:fill-box;transform-origin:center;transform:scale(0) rotate(-45deg);opacity:0;fill:url(#iGold);filter:drop-shadow(0 0 4px rgba(233,200,143,.9));animation:iStar .8s 1.9s cubic-bezier(.3,1.6,.5,1) forwards,iTwinkle 1.4s 2.7s ease-in-out infinite}
-.intro-name{font:500 clamp(.8rem,3.6vw,1.05rem)/1.2 Manrope,system-ui,sans-serif;letter-spacing:.42em;margin-right:-.42em;text-transform:uppercase;color:#8b6233;opacity:0;transform:translateY(8px);animation:iName .7s 1.5s ease forwards}
+.intro-name{display:grid;justify-items:center;gap:10px;text-align:center;font:500 clamp(.8rem,3.6vw,1.05rem)/1.2 Manrope,system-ui,sans-serif;letter-spacing:.42em;margin-right:-.42em;text-transform:uppercase;color:#8b6233;opacity:0;transform:translateY(8px);animation:iName .7s 1.5s ease forwards}
+.intro-sub{font-size:.78em;font-weight:400;letter-spacing:.32em;margin-right:-.32em;color:#a8834f;opacity:0;transform:translateY(6px);animation:iName .7s 1.85s ease forwards}
 @keyframes iDraw{to{stroke-dashoffset:0}}
 @keyframes iSpark{0%{opacity:0;offset-distance:0%}8%{opacity:1}90%{opacity:1}100%{opacity:0;offset-distance:100%}}
 @keyframes iFade{to{opacity:1}}
@@ -331,7 +332,7 @@ html.intro-leave body>:not(.intro){opacity:1}
     <g transform="rotate(-9 100 112)"><path class="i-ring front" pathLength="100" d="M184 112A84 19 0 0 1 16 112"/></g>
     <path class="i-star" d="M168 6C169.5 17 171 20.5 182 22C171 23.5 169.5 27 168 38C166.5 27 165 23.5 154 22C165 20.5 166.5 17 168 6Z"/>
   </svg>
-  <span class="intro-name">Доктор Кудрявцева</span>
+  <span class="intro-name"><span>Доктор Кудрявцева</span><span class="intro-sub">Анна Дмитриевна</span></span>
 </div>
 <script>(function(){var d=document.documentElement,el=document.querySelector(".intro");if(!d.classList.contains("intro-on")){el&&el.parentNode.removeChild(el);return}
 var meta=document.querySelector('meta[name="theme-color"]'),tc=meta&&meta.content,left=0,t0=Date.now();if(meta)meta.content="#f1e3d6";
@@ -381,7 +382,7 @@ pages.push({
   <div class="container hero-inner">
     <div class="hero-copy hero-anim">
       <span class="eyebrow eyebrow--plain">Современная стоматология <br>с заботой о вашем здоровье</span>
-      <h1 id="hero-title"><span>Доктор</span> <span>Кудрявцева</span></h1>
+      <div class="hero-title"><h1 id="hero-title"><span>Доктор</span> <span>Кудрявцева</span></h1><p class="hero-name">Анна Дмитриевна</p></div>
       <ul class="specs">${SPECS.map((s) => `<li>${s}</li>`).join("")}</ul>
       <div class="btn-row">
         <a class="btn btn--primary" href="${p}contacts.html#zapis">${ic("i-calendar")}Записаться на приём</a>
