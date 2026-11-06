@@ -10,7 +10,7 @@ export const SPECS = [
 export const PERKS = [
   { icon: "i-microscope", text: "Лечение<br>под микроскопом" },
   { icon: "i-shield", text: "Сохранение<br>собственных зубов" },
-  { icon: "i-diamond", text: "Эстетика и<br>естественный результат" },
+  { icon: "i-diamond", text: "Эстетика<br>и естественный результат" },
   { icon: "i-tooth", text: "Комплексный<br>подход к лечению" },
 ];
 

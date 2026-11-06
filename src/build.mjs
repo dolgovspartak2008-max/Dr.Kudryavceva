@@ -210,8 +210,7 @@ function serviceArt(p, s) {
 function serviceCard(p, s, withText = false) {
   return `<a class="service-card" href="${p}services/${s.slug}.html">
       ${serviceArt(p, s)}
-      <span class="service-body"><h3>${s.title}</h3>${withText ? `<p>${s.short}</p>` : ""}</span>
-      <span class="go" aria-hidden="true">${ic("i-arrow")}</span>
+      <span class="service-body"><h3>${s.title}</h3>${withText ? `<p>${s.short}</p>` : ""}<span class="more" aria-hidden="true">Подробнее${ic("i-arrow")}</span></span>
     </a>`;
 }
 
@@ -231,6 +230,21 @@ function crumbsLd(items) {
     "@context": "https://schema.org", "@type": "BreadcrumbList",
     itemListElement: [{ name: "Главная", path: "" }, ...items].map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: `${SITE_URL}/${c.path}` })),
   })}</script>`;
+}
+
+/* ---------------- Типограф: неразрывные пробелы ----------------
+   Короткие предлоги, союзы и частицы не остаются в конце строки, тире не переносится в начало новой. */
+const SHORT = "без|для|при|про|под|над|изо|что|как|или";
+const NB = "\u00a0";
+function nbspText(t) {
+  return t
+    .replace(new RegExp(`(?<=^|[\\s\u00a0(«"„—/])([а-яё]{1,2}|${SHORT}|№)[ \t]+(?=\\S)`, "giu"), `$1${NB}`)
+    .replace(/[ \t]+(—|–)(?=\s)/g, `${NB}$1`)
+    .replace(/(\d)[ \t]+(г\.|года|лет)/g, `$1${NB}$2`);
+}
+function typo(html) {
+  return html.replace(/(<(script|style|textarea)\b[\s\S]*?<\/\2>)|(<[^>]*>)|([^<]+)/gi,
+    (m, block, _t, tag, text) => (text ? nbspText(text) : m));
 }
 
 /* ---------------- Обёртка страницы ---------------- */
@@ -264,11 +278,19 @@ ${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" hr
 <link rel="stylesheet" href="${p}assets/css/style.css?v=${VER}">
 ${path === "index.html" ? `<link rel="preload" as="image" type="image/webp" imagesrcset="${p}assets/img/kudryavtseva-front-520.webp 520w, ${p}assets/img/kudryavtseva-front-860.webp 860w, ${p}assets/img/kudryavtseva-front-917.webp 917w" imagesizes="(max-width: 760px) 92vw, 42vw">` : ""}
 ${jsonld}
-<script>try{if(sessionStorage.getItem("introSeen")||matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("no-intro")}catch(e){}</script>
+<script>(function(d){var on=1;try{if(sessionStorage.getItem("introSeen"))on=0}catch(e){}try{if(matchMedia("(prefers-reduced-motion: reduce)").matches)on=0}catch(e){}if(on)d.classList.add("intro-on")})(document.documentElement)</script>
 <style>
-.intro{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;align-content:center;gap:26px;background:radial-gradient(ellipse at 50% 46%,#fffaf4 0%,#f8eee4 45%,#f1e3d6 100%);transition:opacity .6s ease,visibility .6s;}
-.no-intro .intro{display:none}
-.intro.is-done{opacity:0;visibility:hidden}
+/* Заставка: показывается только когда скрипт в head поставил .intro-on (без JS её нет — пустого экрана не будет).
+   Слой закрывает «большой» вьюпорт (100lvh), а сам сайт под ним скрыт — снизу под панелью браузера ничего не просвечивает. */
+.intro{display:none}
+html.intro-on,html.intro-on body{overflow:hidden!important;overscroll-behavior:none;background-color:#f1e3d6}
+html.intro-on .intro{display:grid;position:fixed;top:0;right:0;bottom:0;left:0;width:100%;height:100vh;height:100lvh;min-height:100%;z-index:2147483647;place-items:center;align-content:center;gap:26px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);background-color:#f1e3d6;background-image:radial-gradient(ellipse at 50% 46%,#fffaf4 0%,#f8eee4 45%,#f1e3d6 100%);touch-action:none;cursor:pointer;opacity:1;visibility:visible;transition:opacity .7s cubic-bezier(.4,0,.2,1),visibility 0s linear .7s;animation:iFailsafe .01s 7s forwards}
+html.intro-on body>:not(.intro){opacity:0;transition:opacity .8s cubic-bezier(.4,0,.2,1) .12s;animation:iFailsafeShow .01s 7s forwards}
+html.intro-on:not(.intro-leave) .hero-anim>*,html.intro-on:not(.intro-leave) .hero-photo img{animation-play-state:paused}
+html.intro-leave .intro{opacity:0;visibility:hidden}
+html.intro-leave body>:not(.intro){opacity:1}
+@keyframes iFailsafe{to{opacity:0;visibility:hidden}}
+@keyframes iFailsafeShow{to{opacity:1}}
 .intro svg{width:min(46vw,190px);height:auto;overflow:visible}
 .intro .i-line{fill:none;stroke:url(#iGold);stroke-width:6.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:100;stroke-dashoffset:100;filter:drop-shadow(0 0 2px rgba(233,200,143,.9)) drop-shadow(0 6px 10px rgba(139,98,51,.18));animation:iDraw 1.3s .15s cubic-bezier(.55,.1,.35,1) forwards}
 .intro .i-spark{offset-path:path("M100 50C90 42 80 37 68 37C48 37 38 52 38 72C38 92 46 104 50 122C54 140 56 170 70 170C82 170 82 150 86 138C89 128 93 122 100 122C107 122 111 128 114 138C118 150 118 170 130 170C144 170 146 140 150 122C154 104 162 92 162 72C162 52 152 37 132 37C120 37 110 42 100 50Z");offset-distance:0%;fill:#fff;filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 7px #e9c88f);opacity:0;animation:iSpark 1.3s .15s cubic-bezier(.55,.1,.35,1) forwards}
@@ -311,13 +333,21 @@ ${jsonld}
   </svg>
   <span class="intro-name">Доктор Кудрявцева</span>
 </div>
-<script>(function(){var d=document.documentElement;if(d.classList.contains("no-intro"))return;var el=document.querySelector(".intro");function done(){if(!el||el.classList.contains("is-done"))return;el.classList.add("is-done");try{sessionStorage.setItem("introSeen","1")}catch(e){}setTimeout(function(){el&&el.remove()},700)}setTimeout(done,3100);el&&el.addEventListener("click",done)})();</script>
+<script>(function(){var d=document.documentElement,el=document.querySelector(".intro");if(!d.classList.contains("intro-on")){el&&el.parentNode.removeChild(el);return}
+var meta=document.querySelector('meta[name="theme-color"]'),tc=meta&&meta.content,left=0,t0=Date.now();if(meta)meta.content="#f1e3d6";
+function clean(){d.classList.remove("intro-on","intro-leave");if(meta)meta.content=tc;if(el&&el.parentNode)el.parentNode.removeChild(el);el=null}
+function leave(){if(left)return;left=1;try{sessionStorage.setItem("introSeen","1")}catch(e){}d.classList.add("intro-leave");var t=setTimeout(clean,900);el&&el.addEventListener("transitionend",function(e){if(e.target===el&&e.propertyName==="opacity"){clearTimeout(t);clean()}})}
+function ready(){if(document.readyState==="complete"||Date.now()-t0>4600)leave();else setTimeout(ready,150)}
+setTimeout(ready,3000);setTimeout(leave,5200);window.__introDone=leave;
+if(el){el.addEventListener("click",leave);el.addEventListener("touchmove",function(e){e.preventDefault()},{passive:false})}
+document.addEventListener("keydown",function(e){if(e.key==="Escape"||e.key==="Enter"||e.key===" ")leave()});
+window.addEventListener("pageshow",function(e){if(e.persisted)clean()})})();</script>
 ${sprite}
-${header(p, active)}
+${typo(`${header(p, active)}
 <main id="main">
 ${body(p)}
 </main>
-${footer(p)}
+${footer(p)}`)}
 <script src="${p}assets/js/config.js?v=${VER}"></script>
 ${cases ? `<script src="${p}assets/js/cases.js?v=${VER}"></script>` : ""}
 <script src="${p}assets/js/main.js?v=${VER}"></script>
@@ -350,7 +380,7 @@ pages.push({
   <span class="hero-arc" aria-hidden="true"></span>
   <div class="container hero-inner">
     <div class="hero-copy hero-anim">
-      <span class="eyebrow eyebrow--plain">Современная стоматология<br>с заботой о вашем здоровье</span>
+      <span class="eyebrow eyebrow--plain">Современная стоматология <br>с заботой о вашем здоровье</span>
       <h1 id="hero-title"><span>Доктор</span> <span>Кудрявцева</span></h1>
       <ul class="specs">${SPECS.map((s) => `<li>${s}</li>`).join("")}</ul>
       <div class="btn-row">
@@ -367,7 +397,7 @@ pages.push({
 
 <div class="perks-wrap">
   <div class="container">
-    <ul class="perks" aria-label="Преимущества">${PERKS.map((x) => `<li class="perk">${ic(x.icon)}<span>${x.text}</span></li>`).join("")}</ul>
+    <ul class="perks" aria-label="Преимущества">${PERKS.map((x) => `<li class="perk">${ic(x.icon)}<span>${x.text.replace(/<br>/g, " <br>")}</span></li>`).join("")}</ul>
   </div>
 </div>
 
@@ -377,7 +407,7 @@ pages.push({
       <div><span class="eyebrow">Услуги</span><h2 id="services-title">Направления лечения</h2></div>
       <a class="link-arrow" href="${p}services.html"><span>Смотреть все услуги</span>${ic("i-arrow")}</a>
     </div>
-    <div class="services-grid" data-reveal>${SERVICES.map((s) => serviceCard(p, s)).join("")}</div>
+    <div class="services-grid" data-reveal>${SERVICES.map((s) => serviceCard(p, s, true)).join("")}</div>
   </div>
 </section>
 
@@ -490,7 +520,7 @@ for (const s of SERVICES) {
       <h3>Нужна консультация?</h3>
       <p class="muted">Врач осмотрит, при необходимости назначит снимки и объяснит варианты лечения.</p>
       <a class="btn btn--primary" href="#svc-booking">Записаться${ic("i-arrow")}</a>
-      <span class="eyebrow eyebrow--plain" style="margin-top:8px">Другие услуги</span>
+      <span class="eyebrow eyebrow--plain">Другие услуги</span>
       <ul class="aside-nav">${SERVICES.filter((o) => o.slug !== s.slug).map((o) => `<li><a href="${p}services/${o.slug}.html">${o.title}${ic("i-arrow")}</a></li>`).join("")}</ul>
     </aside>
   </div>
@@ -527,7 +557,7 @@ pages.push({
     <div class="detail-copy hero-anim">
       ${crumbs(p, [{ label: "О докторе" }])}
       <span class="eyebrow">О докторе</span>
-      <h1>Кудрявцева Анна Дмитриевна</h1>
+      <h1>Кудрявцева <span class="nobr">Анна Дмитриевна</span></h1>
       <ul class="specs">${SPECS.map((s) => `<li>${s}</li>`).join("")}</ul>
       <p class="lead">Ведущий стоматолог-терапевт — эндодонтист (микроскопист). Работает по специальности с 2018 года.</p>
       <div class="btn-row">
@@ -539,7 +569,7 @@ pages.push({
 
 <section class="section" aria-labelledby="bio-title">
   <div class="container bio">
-    <div class="section-head"><div><span class="eyebrow">Обо мне</span><h2 id="bio-title">Опыт и подход к лечению</h2></div></div>
+    <div class="section-head"><div><span class="eyebrow">О враче</span><h2 id="bio-title">Опыт и подход к лечению</h2></div></div>
     <div class="bio-grid">
       <div class="bio-text" data-reveal>
         <p>Ведущий стоматолог-терапевт — эндодонтист (микроскопист). Работает по специальности с 2018 года. Является лектором, проводит курсы по сложной эндодонтии, художественной реставрации, а также по работе с дентальным микроскопом.</p>
@@ -629,7 +659,7 @@ pages.push({
   <div class="container">
     <div class="filters" data-case-filters role="group" aria-label="Категории работ" hidden></div>
     <div class="case-list" data-cases data-category="all" aria-live="polite"></div>
-    <p class="muted" data-cases-note hidden style="margin-top:24px;font-size:.88rem;display:flex;gap:10px;align-items:flex-start">${ic("i-info")}<span>Фотографии публикуются без ретуши. Результат лечения индивидуален.</span></p>
+    <p class="muted cases-note" data-cases-note hidden>${ic("i-info")}<span>Фотографии публикуются без ретуши. Результат лечения индивидуален.</span></p>
   </div>
 </section>
 ${bookingBand(p, "cases")}

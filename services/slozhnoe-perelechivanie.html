@@ -20,14 +20,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="../assets/css/style.css?v=a6ab9a7668">
+<link rel="stylesheet" href="../assets/css/style.css?v=8bd7b2cb16">
 
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"MedicalProcedure","name":"Сложное перелечивание зубов","description":"Перелечивание — повторное лечение корневых каналов, если после прежнего лечения сохраняется воспаление или пломбирование выполнено не полностью. Цель — сохранить собственный зуб.","url":"https://dr-kudryavceva.vercel.app/services/slozhnoe-perelechivanie.html"}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Главная","item":"https://dr-kudryavceva.vercel.app/"},{"@type":"ListItem","position":2,"name":"Услуги","item":"https://dr-kudryavceva.vercel.app/services.html"},{"@type":"ListItem","position":3,"name":"Сложное перелечивание зубов","item":"https://dr-kudryavceva.vercel.app/services/slozhnoe-perelechivanie.html"}]}</script>
-<script>try{if(sessionStorage.getItem("introSeen")||matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("no-intro")}catch(e){}</script>
+<script>(function(d){var on=1;try{if(sessionStorage.getItem("introSeen"))on=0}catch(e){}try{if(matchMedia("(prefers-reduced-motion: reduce)").matches)on=0}catch(e){}if(on)d.classList.add("intro-on")})(document.documentElement)</script>
 <style>
-.intro{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;align-content:center;gap:26px;background:radial-gradient(ellipse at 50% 46%,#fffaf4 0%,#f8eee4 45%,#f1e3d6 100%);transition:opacity .6s ease,visibility .6s;}
-.no-intro .intro{display:none}
-.intro.is-done{opacity:0;visibility:hidden}
+/* Заставка: показывается только когда скрипт в head поставил .intro-on (без JS её нет — пустого экрана не будет).
+   Слой закрывает «большой» вьюпорт (100lvh), а сам сайт под ним скрыт — снизу под панелью браузера ничего не просвечивает. */
+.intro{display:none}
+html.intro-on,html.intro-on body{overflow:hidden!important;overscroll-behavior:none;background-color:#f1e3d6}
+html.intro-on .intro{display:grid;position:fixed;top:0;right:0;bottom:0;left:0;width:100%;height:100vh;height:100lvh;min-height:100%;z-index:2147483647;place-items:center;align-content:center;gap:26px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);background-color:#f1e3d6;background-image:radial-gradient(ellipse at 50% 46%,#fffaf4 0%,#f8eee4 45%,#f1e3d6 100%);touch-action:none;cursor:pointer;opacity:1;visibility:visible;transition:opacity .7s cubic-bezier(.4,0,.2,1),visibility 0s linear .7s;animation:iFailsafe .01s 7s forwards}
+html.intro-on body>:not(.intro){opacity:0;transition:opacity .8s cubic-bezier(.4,0,.2,1) .12s;animation:iFailsafeShow .01s 7s forwards}
+html.intro-on:not(.intro-leave) .hero-anim>*,html.intro-on:not(.intro-leave) .hero-photo img{animation-play-state:paused}
+html.intro-leave .intro{opacity:0;visibility:hidden}
+html.intro-leave body>:not(.intro){opacity:1}
+@keyframes iFailsafe{to{opacity:0;visibility:hidden}}
+@keyframes iFailsafeShow{to{opacity:1}}
 .intro svg{width:min(46vw,190px);height:auto;overflow:visible}
 .intro .i-line{fill:none;stroke:url(#iGold);stroke-width:6.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:100;stroke-dashoffset:100;filter:drop-shadow(0 0 2px rgba(233,200,143,.9)) drop-shadow(0 6px 10px rgba(139,98,51,.18));animation:iDraw 1.3s .15s cubic-bezier(.55,.1,.35,1) forwards}
 .intro .i-spark{offset-path:path("M100 50C90 42 80 37 68 37C48 37 38 52 38 72C38 92 46 104 50 122C54 140 56 170 70 170C82 170 82 150 86 138C89 128 93 122 100 122C107 122 111 128 114 138C118 150 118 170 130 170C144 170 146 140 150 122C154 104 162 92 162 72C162 52 152 37 132 37C120 37 110 42 100 50Z");offset-distance:0%;fill:#fff;filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 7px #e9c88f);opacity:0;animation:iSpark 1.3s .15s cubic-bezier(.55,.1,.35,1) forwards}
@@ -70,15 +78,23 @@
   </svg>
   <span class="intro-name">Доктор Кудрявцева</span>
 </div>
-<script>(function(){var d=document.documentElement;if(d.classList.contains("no-intro"))return;var el=document.querySelector(".intro");function done(){if(!el||el.classList.contains("is-done"))return;el.classList.add("is-done");try{sessionStorage.setItem("introSeen","1")}catch(e){}setTimeout(function(){el&&el.remove()},700)}setTimeout(done,3100);el&&el.addEventListener("click",done)})();</script>
+<script>(function(){var d=document.documentElement,el=document.querySelector(".intro");if(!d.classList.contains("intro-on")){el&&el.parentNode.removeChild(el);return}
+var meta=document.querySelector('meta[name="theme-color"]'),tc=meta&&meta.content,left=0,t0=Date.now();if(meta)meta.content="#f1e3d6";
+function clean(){d.classList.remove("intro-on","intro-leave");if(meta)meta.content=tc;if(el&&el.parentNode)el.parentNode.removeChild(el);el=null}
+function leave(){if(left)return;left=1;try{sessionStorage.setItem("introSeen","1")}catch(e){}d.classList.add("intro-leave");var t=setTimeout(clean,900);el&&el.addEventListener("transitionend",function(e){if(e.target===el&&e.propertyName==="opacity"){clearTimeout(t);clean()}})}
+function ready(){if(document.readyState==="complete"||Date.now()-t0>4600)leave();else setTimeout(ready,150)}
+setTimeout(ready,3000);setTimeout(leave,5200);window.__introDone=leave;
+if(el){el.addEventListener("click",leave);el.addEventListener("touchmove",function(e){e.preventDefault()},{passive:false})}
+document.addEventListener("keydown",function(e){if(e.key==="Escape"||e.key==="Enter"||e.key===" ")leave()});
+window.addEventListener("pageshow",function(e){if(e.persisted)clean()})})();</script>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><symbol id="i-tooth" viewBox="0 0 24 24"><path d="M7.5 3C5 3 3.5 5 3.5 7.6c0 2.3 1 3.7 1.5 5.6.6 2.4.6 7.8 2.6 7.8 1.6 0 1.6-3.3 2.1-5 .4-1.4.9-2.3 2.3-2.3s1.9.9 2.3 2.3c.5 1.7.5 5 2.1 5 2 0 2-5.4 2.6-7.8.5-1.9 1.5-3.3 1.5-5.6C20.5 5 19 3 16.5 3c-2 0-3 1-4.5 1S9.5 3 7.5 3z"/></symbol><symbol id="i-sparkle-tooth" viewBox="0 0 24 24"><g transform="translate(0 2) scale(.86)"><path d="M7.5 3C5 3 3.5 5 3.5 7.6c0 2.3 1 3.7 1.5 5.6.6 2.4.6 7.8 2.6 7.8 1.6 0 1.6-3.3 2.1-5 .4-1.4.9-2.3 2.3-2.3s1.9.9 2.3 2.3c.5 1.7.5 5 2.1 5 2 0 2-5.4 2.6-7.8.5-1.9 1.5-3.3 1.5-5.6C20.5 5 19 3 16.5 3c-2 0-3 1-4.5 1S9.5 3 7.5 3z"/></g><path d="M19.5 1.5v4M17.5 3.5h4"/><path d="M7 7.5c.8-.9 1.8-1.2 3-.9"/></symbol><symbol id="i-root" viewBox="0 0 24 24"><path d="M7.5 3C5 3 3.5 5 3.5 7.6c0 2.3 1 3.7 1.5 5.6.6 2.4.6 7.8 2.6 7.8 1.6 0 1.6-3.3 2.1-5 .4-1.4.9-2.3 2.3-2.3s1.9.9 2.3 2.3c.5 1.7.5 5 2.1 5 2 0 2-5.4 2.6-7.8.5-1.9 1.5-3.3 1.5-5.6C20.5 5 19 3 16.5 3c-2 0-3 1-4.5 1S9.5 3 7.5 3z"/><path d="M10 9.5v7M14 9.5v7"/><circle cx="12" cy="7.2" r=".6"/></symbol><symbol id="i-crown" viewBox="0 0 24 24"><path d="M5 10 6.5 4.5l3.2 2.7L12 3.5l2.3 3.7 3.2-2.7L19 10z"/><path d="M5.5 12.5c0 3.6.9 8.5 2.8 8.5 1.6 0 1.6-3.2 3.7-3.2s2.1 3.2 3.7 3.2c1.9 0 2.8-4.9 2.8-8.5"/></symbol><symbol id="i-implant" viewBox="0 0 24 24"><path d="M7.5 2.5h9a2 2 0 0 1 2 2v.8a3.2 3.2 0 0 1-3.2 3.2H8.7a3.2 3.2 0 0 1-3.2-3.2v-.8a2 2 0 0 1 2-2z"/><path d="M10 8.5v2h4v-2"/><path d="M9.6 10.5h4.8l-1 11h-2.8z"/><path d="M8.6 13h6.8M9 15.8h6M9.4 18.6h5.2"/></symbol><symbol id="i-bone" viewBox="0 0 24 24"><circle cx="6" cy="8.4" r="2.3"/><circle cx="8.4" cy="6" r="2.3"/><circle cx="15.6" cy="18" r="2.3"/><circle cx="18" cy="15.6" r="2.3"/><path d="M7.4 10.1l6.5 6.5M10.1 7.4l6.5 6.5"/></symbol><symbol id="i-extract" viewBox="0 0 24 24"><g transform="translate(0 3.5) scale(.82)"><path d="M7.5 3C5 3 3.5 5 3.5 7.6c0 2.3 1 3.7 1.5 5.6.6 2.4.6 7.8 2.6 7.8 1.6 0 1.6-3.3 2.1-5 .4-1.4.9-2.3 2.3-2.3s1.9.9 2.3 2.3c.5 1.7.5 5 2.1 5 2 0 2-5.4 2.6-7.8.5-1.9 1.5-3.3 1.5-5.6C20.5 5 19 3 16.5 3c-2 0-3 1-4.5 1S9.5 3 7.5 3z"/></g><path d="M19.5 10V2.5M17 5l2.5-2.5L22 5"/></symbol><symbol id="i-microscope" viewBox="0 0 24 24"><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2z"/><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/></symbol><symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol><symbol id="i-diamond" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 13L2 9z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></symbol><symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol><symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol><symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol><symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol><symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/></symbol><symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></symbol><symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></symbol><symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol><symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol><symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol><symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol><symbol id="i-chev-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol><symbol id="i-chev-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol><symbol id="i-cap" viewBox="0 0 24 24"><path d="M22 10 12 5 2 10l10 5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/><path d="M22 10v6"/></symbol><symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></symbol><symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M2 13h20"/></symbol><symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M8.2 13.2 7 22l5-3 5 3-1.2-8.8"/></symbol><symbol id="i-images" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></symbol><symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol><symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol><symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol></defs></svg>
-<a class="skip-link" href="#main">Перейти к содержанию</a>
+<a class="skip-link" href="#main">Перейти к содержанию</a>
 <header class="site-header">
   <div class="container header-inner">
     <a class="logo" href="../" aria-label="Доктор Кудрявцева — на главную"><svg class="icon " aria-hidden="true"><use href="#i-tooth"></use></svg><span class="logo-text"><span>Доктор</span><span>Кудрявцева</span></span></a>
-    <nav class="main-nav" aria-label="Основное меню"><ul><li><a href="../">Главная</a></li><li><a href="../services.html" aria-current="page">Услуги</a></li><li><a href="../about.html">О докторе</a></li><li><a href="../cases.html">Примеры работ</a></li><li><a href="../contacts.html">Контакты</a></li></ul></nav>
+    <nav class="main-nav" aria-label="Основное меню"><ul><li><a href="../">Главная</a></li><li><a href="../services.html" aria-current="page">Услуги</a></li><li><a href="../about.html">О докторе</a></li><li><a href="../cases.html">Примеры работ</a></li><li><a href="../contacts.html">Контакты</a></li></ul></nav>
     <a class="header-phone" data-cfg="phone" href="#" hidden><svg class="icon " aria-hidden="true"><use href="#i-phone"></use></svg><span data-cfg-text></span></a>
-    <a class="btn btn--primary btn--sm header-cta" href="../contacts.html#zapis">Записаться на приём</a>
+    <a class="btn btn--primary btn--sm header-cta" href="../contacts.html#zapis">Записаться на приём</a>
     <div class="header-actions">
       <a class="round-btn round-btn--gold" data-contact-btn href="../contacts.html#zapis" aria-label="Записаться на приём"><svg class="icon " aria-hidden="true"><use href="#i-calendar"></use></svg></a>
       <button class="round-btn burger" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu"><svg class="icon " aria-hidden="true"><use href="#i-menu"></use></svg></button>
@@ -90,9 +106,9 @@
     <a class="logo" href="../" aria-label="Доктор Кудрявцева — на главную"><svg class="icon " aria-hidden="true"><use href="#i-tooth"></use></svg><span class="logo-text"><span>Доктор</span><span>Кудрявцева</span></span></a>
     <button class="round-btn" type="button" aria-label="Закрыть меню" data-menu-close><svg class="icon " aria-hidden="true"><use href="#i-close"></use></svg></button>
   </div>
-  <nav aria-label="Мобильное меню"><ul><li><a href="../">Главная<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="../services.html" aria-current="page">Услуги<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="../about.html">О докторе<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="../cases.html">Примеры работ<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="../contacts.html">Контакты<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li></ul></nav>
+  <nav aria-label="Мобильное меню"><ul><li><a href="../">Главная<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="../services.html" aria-current="page">Услуги<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="../about.html">О докторе<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="../cases.html">Примеры работ<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="../contacts.html">Контакты<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li></ul></nav>
   <div class="mobile-menu-foot">
-    <a class="btn btn--primary" href="../contacts.html#zapis"><svg class="icon " aria-hidden="true"><use href="#i-calendar"></use></svg>Записаться на приём</a>
+    <a class="btn btn--primary" href="../contacts.html#zapis"><svg class="icon " aria-hidden="true"><use href="#i-calendar"></use></svg>Записаться на приём</a>
     <a class="btn btn--ghost" data-cfg="phone" href="#" hidden><svg class="icon " aria-hidden="true"><use href="#i-phone"></use></svg><span data-cfg-text></span></a>
     <div class="messengers">
       <a class="btn btn--ghost" data-cfg="telegram" href="#" hidden><svg class="icon " aria-hidden="true"><use href="#i-send"></use></svg>Telegram</a>
@@ -106,11 +122,11 @@
   <div class="container detail-hero">
     <div class="detail-copy hero-anim">
       <nav class="breadcrumbs" aria-label="Хлебные крошки"><ol><li><a href="../">Главная</a></li><li><a href="../services.html">Услуги</a></li><li aria-current="page">Сложное перелечивание зубов</li></ol></nav>
-      <span class="eyebrow">Эндодонтия под микроскопом</span>
+      <span class="eyebrow">Эндодонтия под микроскопом</span>
       <h1>Сложное перелечивание зубов</h1>
-      <p class="lead">Перелечивание — повторное лечение корневых каналов, если после прежнего лечения сохраняется воспаление или пломбирование выполнено не полностью. Цель — сохранить собственный зуб.</p>
+      <p class="lead">Перелечивание — повторное лечение корневых каналов, если после прежнего лечения сохраняется воспаление или пломбирование выполнено не полностью. Цель — сохранить собственный зуб.</p>
       <div class="btn-row">
-        <a class="btn btn--primary" href="#svc-booking"><svg class="icon " aria-hidden="true"><use href="#i-calendar"></use></svg>Записаться на приём</a>
+        <a class="btn btn--primary" href="#svc-booking"><svg class="icon " aria-hidden="true"><use href="#i-calendar"></use></svg>Записаться на приём</a>
       </div>
     </div>
     <span aria-hidden="true" class="service-art has-img"><img src="../assets/img/services/slozhnoe-perelechivanie.webp" alt="" loading="lazy" decoding="async"></span>
@@ -121,22 +137,22 @@
     <div class="detail-main">
       <div class="detail-block" data-reveal>
         <h2>Когда это нужно</h2>
-        <ul class="bullets"><li><svg class="icon " aria-hidden="true"><use href="#i-check"></use></svg><span>Воспаление у верхушки корня ранее леченого зуба</span></li><li><svg class="icon " aria-hidden="true"><use href="#i-check"></use></svg><span>Боль или дискомфорт при накусывании на леченый зуб</span></li><li><svg class="icon " aria-hidden="true"><use href="#i-check"></use></svg><span>На снимке видно неполное пломбирование каналов</span></li><li><svg class="icon " aria-hidden="true"><use href="#i-check"></use></svg><span>Перед протезированием зуба с сомнительным лечением каналов</span></li><li><svg class="icon " aria-hidden="true"><use href="#i-check"></use></svg><span>Свищ или отёк десны в области зуба</span></li><li><svg class="icon " aria-hidden="true"><use href="#i-check"></use></svg><span>Фрагмент инструмента в канале — возможность извлечения оценивается индивидуально</span></li></ul>
+        <ul class="bullets"><li><svg class="icon " aria-hidden="true"><use href="#i-check"></use></svg><span>Воспаление у верхушки корня ранее леченого зуба</span></li><li><svg class="icon " aria-hidden="true"><use href="#i-check"></use></svg><span>Боль или дискомфорт при накусывании на леченый зуб</span></li><li><svg class="icon " aria-hidden="true"><use href="#i-check"></use></svg><span>На снимке видно неполное пломбирование каналов</span></li><li><svg class="icon " aria-hidden="true"><use href="#i-check"></use></svg><span>Перед протезированием зуба с сомнительным лечением каналов</span></li><li><svg class="icon " aria-hidden="true"><use href="#i-check"></use></svg><span>Свищ или отёк десны в области зуба</span></li><li><svg class="icon " aria-hidden="true"><use href="#i-check"></use></svg><span>Фрагмент инструмента в канале — возможность извлечения оценивается индивидуально</span></li></ul>
       </div>
       <div class="detail-block" data-reveal>
-        <h2>Как проходит лечение</h2>
-        <ol class="timeline"><li><span class="n">1</span><div><h3>Диагностика</h3><p>Снимки и компьютерная томография показывают анатомию корней и состояние тканей вокруг них.</p></div></li><li><span class="n">2</span><div><h3>Изоляция зуба</h3><p>Коффердам защищает каналы от слюны и бактерий на протяжении всего лечения.</p></div></li><li><span class="n">3</span><div><h3>Распломбирование под микроскопом</h3><p>Старый пломбировочный материал удаляется, врач ищет пропущенные и дополнительные каналы.</p></div></li><li><span class="n">4</span><div><h3>Обработка каналов</h3><p>Механическая и медикаментозная очистка. Иногда требуется временное лекарство и второй визит.</p></div></li><li><span class="n">5</span><div><h3>Пломбирование и восстановление</h3><p>Каналы герметично пломбируются, затем восстанавливается коронковая часть зуба.</p></div></li></ol>
+        <h2>Как проходит лечение</h2>
+        <ol class="timeline"><li><span class="n">1</span><div><h3>Диагностика</h3><p>Снимки и компьютерная томография показывают анатомию корней и состояние тканей вокруг них.</p></div></li><li><span class="n">2</span><div><h3>Изоляция зуба</h3><p>Коффердам защищает каналы от слюны и бактерий на протяжении всего лечения.</p></div></li><li><span class="n">3</span><div><h3>Распломбирование под микроскопом</h3><p>Старый пломбировочный материал удаляется, врач ищет пропущенные и дополнительные каналы.</p></div></li><li><span class="n">4</span><div><h3>Обработка каналов</h3><p>Механическая и медикаментозная очистка. Иногда требуется временное лекарство и второй визит.</p></div></li><li><span class="n">5</span><div><h3>Пломбирование и восстановление</h3><p>Каналы герметично пломбируются, затем восстанавливается коронковая часть зуба.</p></div></li></ol>
       </div>
       <div class="note-card" data-reveal>
-        <h3>Что важно знать</h3>
-        <ul><li>Прогноз зависит от исходной ситуации. Врач обсуждает его с вами до начала лечения.</li><li>Лечение может проходить в один или несколько визитов.</li><li>После лечения каналов зубу часто нужна защита — вкладка или коронка.</li></ul>
+        <h3>Что важно знать</h3>
+        <ul><li>Прогноз зависит от исходной ситуации. Врач обсуждает его с вами до начала лечения.</li><li>Лечение может проходить в один или несколько визитов.</li><li>После лечения каналов зубу часто нужна защита — вкладка или коронка.</li></ul>
       </div>
     </div>
     <aside class="aside-card" aria-label="Запись и другие услуги">
       <h3>Нужна консультация?</h3>
-      <p class="muted">Врач осмотрит, при необходимости назначит снимки и объяснит варианты лечения.</p>
+      <p class="muted">Врач осмотрит, при необходимости назначит снимки и объяснит варианты лечения.</p>
       <a class="btn btn--primary" href="#svc-booking">Записаться<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a>
-      <span class="eyebrow eyebrow--plain" style="margin-top:8px">Другие услуги</span>
+      <span class="eyebrow eyebrow--plain">Другие услуги</span>
       <ul class="aside-nav"><li><a href="../services/esteticheskaya-restavraciya.html">Эстетическая реставрация зубов<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="../services/protezirovanie.html">Протезирование зубов<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="../services/implantaciya.html">Имплантация<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="../services/kostnaya-plastika.html">Костные пластики<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li><li><a href="../services/udalenie-zubov-mudrosti.html">Удаление зубов мудрости<svg class="icon " aria-hidden="true"><use href="#i-arrow"></use></svg></a></li></ul>
     </aside>
   </div>
@@ -145,8 +161,8 @@
   <div class="container">
     <div class="booking-card" data-reveal>
       <div class="booking-intro">
-        <h2 id="svc-title">Запишитесь на приём</h2>
-        <p>Получите консультацию и индивидуальный план лечения. Заполните форму — откроется WhatsApp, где вам подберут время визита.</p>
+        <h2 id="svc-title">Запишитесь на приём</h2>
+        <p>Получите консультацию и индивидуальный план лечения. Заполните форму — откроется WhatsApp, где вам подберут время визита.</p>
       </div>
       <form class="form form--dark" data-booking novalidate>
     <div class="form-grid"><div class="field">
@@ -156,16 +172,16 @@
       </div><div class="field">
         <label for="svc-service">Услуга</label>
         <div class="input-wrap"><svg class="icon " aria-hidden="true"><use href="#i-tooth"></use></svg><select id="svc-service" name="service" required><option value="">Выберите услугу</option>
-      <option value="konsultaciya">Консультация и диагностика</option>
+      <option value="konsultaciya">Консультация и диагностика</option>
       <option value="esteticheskaya-restavraciya">Эстетическая реставрация зубов</option><option value="slozhnoe-perelechivanie" selected>Сложное перелечивание зубов</option><option value="protezirovanie">Протезирование зубов</option><option value="implantaciya">Имплантация</option><option value="kostnaya-plastika">Костные пластики</option><option value="udalenie-zubov-mudrosti">Удаление зубов мудрости</option>
-      <option value="ne-znayu">Не знаю, нужна консультация врача</option></select></div>
+      <option value="ne-znayu">Не знаю, нужна консультация врача</option></select></div>
         <span class="field-error" aria-live="polite"></span>
       </div></div>
     
-    <div class="hp" aria-hidden="true"><label for="svc-website">Не заполняйте это поле</label><input id="svc-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+    <div class="hp" aria-hidden="true"><label for="svc-website">Не заполняйте это поле</label><input id="svc-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
     <div class="form-foot">
-      <label class="check"><input id="svc-consent" type="checkbox" name="consent" required><span>Даю <a href="../consent.html">согласие на обработку персональных данных</a> и принимаю <a href="../privacy.html">политику конфиденциальности</a><span class="field-error" aria-live="polite"></span></span></label>
-      <button class="btn btn--primary" type="submit"><svg class="icon " aria-hidden="true"><use href="#i-chat"></use></svg>Записаться в WhatsApp</button>
+      <label class="check"><input id="svc-consent" type="checkbox" name="consent" required><span>Даю <a href="../consent.html">согласие на обработку персональных данных</a> и принимаю <a href="../privacy.html">политику конфиденциальности</a><span class="field-error" aria-live="polite"></span></span></label>
+      <button class="btn btn--primary" type="submit"><svg class="icon " aria-hidden="true"><use href="#i-chat"></use></svg>Записаться в WhatsApp</button>
     </div>
     <p class="form-status" role="status" aria-live="polite" hidden></p>
   </form>
@@ -178,7 +194,7 @@
   <div class="container">
     <div class="footer-top">
       <a class="logo" href="../"><svg class="icon " aria-hidden="true"><use href="#i-tooth"></use></svg><span class="logo-text"><span>Доктор</span><span>Кудрявцева</span></span></a>
-      <nav class="footer-nav" aria-label="Разделы сайта"><ul><li><a href="../">Главная</a></li><li><a href="../services.html">Услуги</a></li><li><a href="../about.html">О докторе</a></li><li><a href="../cases.html">Примеры работ</a></li><li><a href="../contacts.html">Контакты</a></li></ul></nav>
+      <nav class="footer-nav" aria-label="Разделы сайта"><ul><li><a href="../">Главная</a></li><li><a href="../services.html">Услуги</a></li><li><a href="../about.html">О докторе</a></li><li><a href="../cases.html">Примеры работ</a></li><li><a href="../contacts.html">Контакты</a></li></ul></nav>
       <div class="footer-contacts">
         <a class="pill-link" data-cfg="telegram" data-cfg-keep-text href="#" hidden><svg class="icon " aria-hidden="true"><use href="#i-send"></use></svg><span>Telegram</span></a>
         <a class="pill-link" data-cfg="whatsapp" data-cfg-keep-text href="#" hidden><svg class="icon " aria-hidden="true"><use href="#i-chat"></use></svg><span>WhatsApp</span></a>
@@ -187,7 +203,7 @@
     </div>
     <div class="footer-bottom">
       <div class="footer-legal">
-        <span>© <span data-year>2026</span> Доктор Кудрявцева. <a href="../privacy.html">Политика конфиденциальности</a> · <a href="../consent.html">Согласие на обработку данных</a></span>
+        <span>© <span data-year>2026</span> Доктор Кудрявцева. <a href="../privacy.html">Политика конфиденциальности</a> · <a href="../consent.html">Согласие на обработку данных</a></span>
         <span data-cfg="license" data-cfg-mode="text" hidden></span>
       </div>
       <span>Имеются противопоказания. Необходима консультация специалиста.</span>
@@ -195,8 +211,8 @@
   </div>
 </footer>
 
-<script src="../assets/js/config.js?v=a6ab9a7668"></script>
+<script src="../assets/js/config.js?v=8bd7b2cb16"></script>
 
-<script src="../assets/js/main.js?v=a6ab9a7668"></script>
+<script src="../assets/js/main.js?v=8bd7b2cb16"></script>
 </body>
 </html>

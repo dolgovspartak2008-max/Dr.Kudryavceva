@@ -5,6 +5,17 @@
   var BASE = document.body.getAttribute("data-base") || "";
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Страховка заставки: если по какой-то причине она не закрылась сама — закрываем принудительно.
+  setTimeout(function () {
+    var d = document.documentElement;
+    if (!d.classList.contains("intro-on")) return;
+    if (typeof window.__introDone === "function") window.__introDone();
+    setTimeout(function () {
+      d.classList.remove("intro-on", "intro-leave");
+      var el = document.querySelector(".intro"); if (el && el.parentNode) el.parentNode.removeChild(el);
+    }, 1000);
+  }, 6500);
+
   var CATEGORIES = {
     "restavraciya": "Эстетическая реставрация",
     "perelechivanie": "Перелечивание каналов",
@@ -22,6 +33,8 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
+  // неразрывный пробел после коротких слов — как в статичных страницах
+  function nb(s) { return String(s || "").replace(/(^|[\s\u00a0(«])([а-яёА-ЯЁ]{1,2}|без|для|при|про|под|над|что|как|или) (?=\S)/g, "$1$2\u00a0").replace(/ (—|–) /g, "\u00a0$1 "); }
   function val(key) { return String(CFG[key] || "").trim(); }
 
   /* ---------- Данные из config.js ---------- */
@@ -249,7 +262,7 @@
     }).join("");
     return '<article class="case-row" data-reveal>' +
       '<div class="case-info"><span class="cat">' + esc(CATEGORIES[c.category] || "") + "</span>" +
-      "<h3>" + esc(c.title) + "</h3>" + (c.text ? "<p>" + esc(c.text) + "</p>" : "") + "</div>" +
+      "<h3>" + esc(nb(c.title)) + "</h3>" + (c.text ? "<p>" + esc(nb(c.text)) + "</p>" : "") + "</div>" +
       '<div class="case-photos" style="--n:' + c.photos.length + '">' + photos + "</div></article>";
   }
 
