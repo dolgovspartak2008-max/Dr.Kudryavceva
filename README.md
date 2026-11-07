@@ -55,6 +55,16 @@ node src/build.mjs
 
 Нужен Node.js 18+. При смене домена поменяйте `SITE_URL` в `src/build.mjs` (canonical, sitemap, og:image).
 
+## 5. SEO — `src/build.mjs`, блок «SEO-настройки»
+
+- `CITY`, `CITY_IN`, `REGION` — город приёма: попадает в title, description, H1 услуг и разметку Schema.org.
+- `YANDEX_VERIFICATION`, `GOOGLE_VERIFICATION` — коды подтверждения из Яндекс Вебмастера и Google Search Console (только значение `content`).
+- `YANDEX_METRIKA_ID` — номер счётчика Метрики; пусто — счётчик не подключается.
+- `SAME_AS` — ссылки на профили врача (Яндекс Карты, ПроДокторов, НаПоправку, Telegram) для разметки.
+- SEO-заголовки и FAQ услуг — поля `seoTitle`, `h1`, `seo`, `faq` в `src/content.mjs`.
+- `favicon.ico`, `icon-*.png`, `apple-touch-icon.png`, `assets/img/og-image.jpg` (превью ссылок 1200×630) — готовые файлы.
+- Адрес `dr-kudryavceva.vercel.app` перенаправляется на основной домен (`vercel.json`), чтобы не было дублей.
+
 ## Фотографии
 - `reference/portrait-2-front.png` — портрет анфас (первый экран главной).
 - `reference/portrait-3-hand.png` — портрет с рукой (блок «О докторе» на главной и страница «О докторе»).

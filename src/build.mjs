@@ -2,6 +2,7 @@
 // Шапка, подвал, иконки и форма записи общие для всех страниц.
 import { writeFileSync, mkdirSync, readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
+import vm from "node:vm";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { SPECS, PERKS, STEPS, SERVICES, ABOUT, DOCS } from "./content.mjs";
@@ -12,6 +13,21 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE_URL = "https://dr-kudryavceva.online";
 
 const SITE = "Доктор Кудрявцева";
+
+/* ---------------- SEO-настройки ---------------- */
+// Город приёма: попадает в заголовки, описания и разметку Schema.org.
+const CITY = "Красногорск";
+const CITY_IN = "в Красногорске";
+const REGION = "Московская область";
+const DOCTOR = "Кудрявцева Анна Дмитриевна";
+// Коды подтверждения прав (только значение content из мета-тега). Пусто — тег не выводится.
+const YANDEX_VERIFICATION = "";   // Яндекс Вебмастер → «Мета-тег»
+const GOOGLE_VERIFICATION = "";   // Google Search Console → «Тег HTML»
+const YANDEX_METRIKA_ID = "";     // номер счётчика Яндекс Метрики, например "98765432"
+// Профили врача на внешних площадках (Telegram, Яндекс Карты, ПроДокторов, НаПоправку…) — для sameAs.
+const SAME_AS = ["https://t.me/Kudryavceva_Anna", "https://t.me/Dr_Vesnushka"];
+const ORG_ID = `${SITE_URL}/#dentist`;
+const PERSON_ID = `${SITE_URL}/about.html#doctor`;
 // Версия ресурсов = хеш содержимого CSS/JS: при любой правке браузеры сразу берут свежие файлы.
 const VER = (() => {
   const h = createHash("sha1");
@@ -144,6 +160,7 @@ function footer(p) {
         <span>© <span data-year>2026</span> ${SITE}. <a href="${p}privacy.html">Политика конфиденциальности</a> · <a href="${p}consent.html">Согласие на обработку данных</a></span>
         <span data-cfg="license" data-cfg-mode="text" hidden></span>
       </div>
+      <span>Стоматолог ${DOCTOR} · приём ${CITY_IN}, ${REGION}</span>
       <span>Имеются противопоказания. Необходима консультация специалиста.</span>
     </div>
   </div>
@@ -204,7 +221,7 @@ function bookingBand(p, id, selected = "") {
 }
 
 function serviceArt(p, s) {
-  return `<span class="service-art${s.image ? " has-img" : ""}">${s.image ? `<img src="${p}${s.image}" alt="" loading="lazy" decoding="async">` : ic(s.icon)}</span>`;
+  return `<span class="service-art${s.image ? " has-img" : ""}">${s.image ? `<img src="${p}${s.image}" alt="${s.title}" width="720" height="720" loading="lazy" decoding="async">` : ic(s.icon)}</span>`;
 }
 
 function serviceCard(p, s, withText = false) {
@@ -232,6 +249,56 @@ function crumbsLd(items) {
   })}</script>`;
 }
 
+function personLd() {
+  return {
+    "@type": "Person",
+    "@id": PERSON_ID,
+    name: DOCTOR,
+    givenName: "Анна", additionalName: "Дмитриевна", familyName: "Кудрявцева",
+    jobTitle: "Стоматолог-терапевт, эндодонтист, стоматолог-хирург, стоматолог-ортопед",
+    hasOccupation: { "@type": "Occupation", name: "Врач-стоматолог", occupationLocation: { "@type": "City", name: CITY } },
+    url: `${SITE_URL}/about.html`,
+    image: `${SITE_URL}/assets/img/kudryavtseva-front-860.jpg`,
+    worksFor: { "@id": ORG_ID },
+    knowsAbout: [...SPECS, ...SERVICES.map((s) => s.title), "Дентальный микроскоп", "Коффердам", "Цифровое сканирование зубов"],
+    alumniOf: [
+      { "@type": "CollegeOrUniversity", name: "Волгоградский государственный медицинский университет" },
+      { "@type": "CollegeOrUniversity", name: "Смоленский государственный медицинский университет" },
+    ],
+    hasCredential: DOCS.map((d) => ({ "@type": "EducationalOccupationalCredential", name: d.title, description: d.note })),
+    sameAs: SAME_AS,
+  };
+}
+
+// Клинические случаи из assets/js/cases.js — заранее в HTML, чтобы поисковики видели фото и подписи без JS.
+// main.js затем перерисовывает список с подписями этапов и просмотром.
+const CASES = (() => {
+  try {
+    const ctx = { window: {} };
+    vm.runInNewContext(readFileSync(join(ROOT, "assets/js/cases.js"), "utf8"), ctx);
+    return ctx.window.CASES || [];
+  } catch { return []; }
+})();
+const CASE_CATS = { restavraciya: "Эстетическая реставрация", perelechivanie: "Перелечивание каналов", protezirovanie: "Протезирование", implantaciya: "Имплантация", "kostnaya-plastika": "Костная пластика", udalenie: "Удаление зубов мудрости" };
+const escAttr = (t = "") => String(t).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+function casesStatic(p) {
+  return CASES.map((c) => `<article class="case-row"><div class="case-info"><span class="cat">${CASE_CATS[c.category] || ""}</span><h3>${escAttr(c.title)}</h3>${c.text ? `<p>${escAttr(c.text)}</p>` : ""}</div><div class="case-photos${c.photos.length === 1 ? " is-single" : ""}" style="--n:${c.photos.length}">${c.photos.map((ph) => `<figure class="case-photo"><img src="${p}${ph.src}" alt="${escAttr(ph.alt || c.title)}" loading="lazy" decoding="async"></figure>`).join("")}</div></article>`).join("");
+}
+
+function faqLd(faq) {
+  return `<script type="application/ld+json">${JSON.stringify({
+    "@context": "https://schema.org", "@type": "FAQPage",
+    mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  })}</script>`;
+}
+
+function faqBlock(faq) {
+  return `<div class="detail-block faq" data-reveal>
+        <h2>Частые вопросы</h2>
+        ${faq.map((f) => `<details class="faq-item"><summary>${f.q}</summary><p>${f.a}</p></details>`).join("")}
+      </div>`;
+}
+
 /* ---------------- Типограф: неразрывные пробелы ----------------
    Короткие предлоги, союзы и частицы не остаются в конце строки, тире не переносится в начало новой. */
 const SHORT = "без|для|при|про|под|над|изо|что|как|или";
@@ -248,11 +315,17 @@ function typo(html) {
 }
 
 /* ---------------- Обёртка страницы ---------------- */
-function page({ path, title, description, active, body, jsonld = "", cases = false, abs = false, noindex = false }) {
+function page({ path, title, seoTitle, description, active, body, jsonld = "", cases = false, abs = false, noindex = false }) {
   const depth = path.split("/").length - 1;
   const p = abs ? "/" : depth ? "../".repeat(depth) : "";
-  const fullTitle = title === SITE ? `${SITE} — стоматолог-эндодонтист, ортопед, хирург-имплантолог` : `${title} — ${SITE}`;
+  const fullTitle = seoTitle || `${title} — ${SITE}`;
   const url = `${SITE_URL}/${path === "index.html" ? "" : path}`;
+  const verify = [
+    YANDEX_VERIFICATION && `<meta name="yandex-verification" content="${YANDEX_VERIFICATION}">`,
+    GOOGLE_VERIFICATION && `<meta name="google-site-verification" content="${GOOGLE_VERIFICATION}">`,
+  ].filter(Boolean).join("\n");
+  const metrika = YANDEX_METRIKA_ID ? `<script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r)return}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");ym(${YANDEX_METRIKA_ID},"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/${YANDEX_METRIKA_ID}" style="position:absolute;left:-9999px" alt=""></div></noscript>` : "";
   return `<!doctype html>
 <html lang="ru">
 <head>
@@ -261,23 +334,33 @@ function page({ path, title, description, active, body, jsonld = "", cases = fal
 <title>${fullTitle}</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="${description}">
-${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" href="${url}">`}
+${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" href="${url}">\n<meta name="robots" content="index, follow, max-image-preview:large">`}
+${verify}
 <meta name="theme-color" content="#fbf7f2">
+<meta name="geo.region" content="RU-MOS">
+<meta name="geo.placename" content="${CITY}">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ru_RU">
 <meta property="og:site_name" content="${SITE}">
 <meta property="og:title" content="${fullTitle}">
 <meta property="og:description" content="${description}">
 <meta property="og:url" content="${url}">
-<meta property="og:image" content="${SITE_URL}/assets/img/kudryavtseva-front-860.jpg">
+<meta property="og:image" content="${SITE_URL}/assets/img/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${DOCTOR} — стоматолог ${CITY_IN}">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="${FAVICON}">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="${p}assets/css/style.css?v=${VER}">
 ${path === "index.html" ? `<link rel="preload" as="image" type="image/webp" imagesrcset="${p}assets/img/kudryavtseva-front-520.webp 520w, ${p}assets/img/kudryavtseva-front-860.webp 860w, ${p}assets/img/kudryavtseva-front-917.webp 917w" imagesizes="(max-width: 760px) 92vw, 42vw">` : ""}
 ${jsonld}
+${metrika}
 <script>(function(d){var on=1;try{if(sessionStorage.getItem("introSeen"))on=0}catch(e){}try{if(matchMedia("(prefers-reduced-motion: reduce)").matches)on=0}catch(e){}if(on)d.classList.add("intro-on")})(document.documentElement)</script>
 <style>
 /* Заставка: показывается только когда скрипт в head поставил .intro-on (без JS её нет — пустого экрана не будет).
@@ -363,25 +446,44 @@ const pages = [];
 pages.push({
   path: "index.html",
   title: SITE,
+  seoTitle: `Стоматолог ${CITY_IN} — ${DOCTOR} | Доктор Кудрявцева`,
   active: "home",
   cases: true,
-  description: "Анна Дмитриевна Кудрявцева — стоматолог-эндодонтист-микроскопист, ортопед, хирург-имплантолог. Лечение под микроскопом, эстетическая реставрация, протезирование, имплантация. Онлайн-запись на приём.",
+  description: `Стоматолог ${CITY_IN} ${DOCTOR}: лечение каналов под микроскопом, реставрация, протезирование и имплантация зубов. Запись онлайн.`,
   jsonld: `<script type="application/ld+json">${JSON.stringify({
     "@context": "https://schema.org",
-    "@type": "Dentist",
-    name: SITE,
-    url: SITE_URL,
-    image: SITE_URL + "/assets/img/kudryavtseva-front-860.jpg",
-    description: "Стоматологическая практика Анны Дмитриевны Кудрявцевой: эндодонтия под микроскопом, эстетическая реставрация, протезирование, имплантация.",
-    employee: { "@type": "Person", name: "Анна Дмитриевна Кудрявцева", jobTitle: "Стоматолог" },
-    availableService: SERVICES.map((s) => ({ "@type": "MedicalProcedure", name: s.title, url: `${SITE_URL}/services/${s.slug}.html` })),
+    "@graph": [
+      { "@type": "WebSite", "@id": `${SITE_URL}/#website`, url: `${SITE_URL}/`, name: SITE, inLanguage: "ru-RU", publisher: { "@id": ORG_ID } },
+      {
+        "@type": "Dentist",
+        "@id": ORG_ID,
+        name: `${SITE} — стоматолог ${CITY_IN}`,
+        alternateName: [SITE, `Стоматолог ${DOCTOR}`],
+        url: `${SITE_URL}/`,
+        logo: `${SITE_URL}/icon-512.png`,
+        image: [`${SITE_URL}/assets/img/og-image.jpg`, `${SITE_URL}/assets/img/kudryavtseva-front-860.jpg`],
+        description: `Частная практика стоматолога ${DOCTOR} ${CITY_IN}: эндодонтия под микроскопом, эстетическая реставрация, протезирование, имплантация, костная пластика, удаление зубов мудрости.`,
+        address: { "@type": "PostalAddress", addressLocality: CITY, addressRegion: REGION, addressCountry: "RU" },
+        areaServed: [{ "@type": "City", name: CITY }, { "@type": "AdministrativeArea", name: REGION }],
+        medicalSpecialty: "Dentistry",
+        knowsLanguage: "ru",
+        sameAs: SAME_AS,
+        founder: { "@id": PERSON_ID },
+        employee: { "@id": PERSON_ID },
+        hasOfferCatalog: {
+          "@type": "OfferCatalog", name: "Услуги стоматолога",
+          itemListElement: SERVICES.map((s) => ({ "@type": "Offer", itemOffered: { "@type": "MedicalProcedure", name: s.title, url: `${SITE_URL}/services/${s.slug}.html` } })),
+        },
+      },
+      personLd(),
+    ],
   })}</script>`,
   body: (p) => `
 <section class="hero" aria-labelledby="hero-title">
   <span class="hero-arc" aria-hidden="true"></span>
   <div class="container hero-inner">
     <div class="hero-copy hero-anim">
-      <span class="eyebrow eyebrow--plain">Современная стоматология <br>с заботой о вашем здоровье</span>
+      <span class="eyebrow eyebrow--plain">Стоматолог ${CITY_IN} <br>с заботой о вашем здоровье</span>
       <div class="hero-title"><h1 id="hero-title"><span>Доктор</span> <span>Кудрявцева</span></h1><p class="hero-name">Анна Дмитриевна</p></div>
       <ul class="specs">${SPECS.map((s) => `<li>${s}</li>`).join("")}</ul>
       <div class="btn-row">
@@ -447,15 +549,16 @@ ${bookingBand(p, "home")}
 pages.push({
   path: "services.html",
   title: "Услуги",
+  seoTitle: `Услуги стоматолога ${CITY_IN} | ${SITE}`,
   active: "services",
-  description: "Услуги доктора Кудрявцевой: эстетическая реставрация, перелечивание каналов под микроскопом, протезирование, имплантация, костная пластика, удаление зубов мудрости.",
+  description: `Услуги стоматолога ${CITY_IN}: реставрация, перелечивание каналов под микроскопом, протезирование, имплантация, костная пластика, удаление зубов мудрости.`,
   jsonld: crumbsLd([{ name: "Услуги", path: "services.html" }]),
   body: (p) => `
 <section class="page-hero">
   <div class="container hero-anim">
     ${crumbs(p, [{ label: "Услуги" }])}
     <span class="eyebrow">Услуги</span>
-    <h1>Направления лечения</h1>
+    <h1>Услуги стоматолога ${CITY_IN}</h1>
     <p class="lead">Терапия и эндодонтия под микроскопом, ортопедия, хирургия и имплантология. Выберите направление, чтобы узнать, как проходит лечение.</p>
   </div>
 </section>
@@ -482,18 +585,22 @@ for (const s of SERVICES) {
   pages.push({
     path: `services/${s.slug}.html`,
     title: s.title,
+    seoTitle: `${s.seoTitle} — ${SITE}`,
     active: "services",
     description: s.seo,
     jsonld: `<script type="application/ld+json">${JSON.stringify({
-      "@context": "https://schema.org", "@type": "MedicalProcedure", name: s.title, description: s.lead, url: `${SITE_URL}/services/${s.slug}.html`,
-    })}</script>${crumbsLd([{ name: "Услуги", path: "services.html" }, { name: s.title, path: `services/${s.slug}.html` }])}`,
+      "@context": "https://schema.org", "@type": "MedicalWebPage", name: s.seoTitle, url: `${SITE_URL}/services/${s.slug}.html`, inLanguage: "ru-RU",
+      about: { "@type": "MedicalProcedure", name: s.title, description: s.lead },
+      reviewedBy: { "@type": "Person", "@id": PERSON_ID, name: DOCTOR },
+      provider: { "@type": "Dentist", "@id": ORG_ID, name: SITE, address: { "@type": "PostalAddress", addressLocality: CITY, addressRegion: REGION, addressCountry: "RU" } },
+    })}</script>${s.faq ? faqLd(s.faq) : ""}${crumbsLd([{ name: "Услуги", path: "services.html" }, { name: s.title, path: `services/${s.slug}.html` }])}`,
     body: (p) => `
 <section class="page-hero">
   <div class="container detail-hero">
     <div class="detail-copy hero-anim">
       ${crumbs(p, [{ href: p + "services.html", label: "Услуги" }, { label: s.title }])}
       <span class="eyebrow">${s.spec}</span>
-      <h1>${s.title}</h1>
+      <h1>${s.h1 || s.title} <span class="h1-city">${CITY_IN}</span></h1>
       <p class="lead">${s.lead}</p>
       <div class="btn-row">
         <a class="btn btn--primary" href="#svc-booking">${ic("i-calendar")}Записаться на приём</a>
@@ -517,6 +624,8 @@ for (const s of SERVICES) {
         <h3>Что важно знать</h3>
         <ul>${s.notes.map((n) => `<li>${n}</li>`).join("")}</ul>
       </div>
+      ${s.faq ? faqBlock(s.faq) : ""}
+      <p class="muted">Лечение проводит ${DOCTOR} — <a href="${p}about.html">стоматолог ${CITY_IN}</a>, эндодонтист-микроскопист, хирург-имплантолог и ортопед. Приём по предварительной записи.</p>
     </div>
     <aside class="aside-card" aria-label="Запись и другие услуги">
       <h3>Нужна консультация?</h3>
@@ -543,11 +652,12 @@ const QUAL = [
 pages.push({
   path: "about.html",
   title: "О докторе",
+  seoTitle: `${DOCTOR} — стоматолог ${CITY_IN}`,
   active: "about",
-  description: "Анна Дмитриевна Кудрявцева — стоматолог-эндодонтист-микроскопист, ортопед, хирург-имплантолог. Лечение под микроскопом, эстетическая реставрация, комплексный подход.",
+  description: `${DOCTOR} — стоматолог ${CITY_IN}: эндодонтист-микроскопист, хирург-имплантолог, ортопед. В профессии с 2018 года. Образование, дипломы, сертификаты.`,
   jsonld: `<script type="application/ld+json">${JSON.stringify({
-    "@context": "https://schema.org", "@type": "Person", name: "Анна Дмитриевна Кудрявцева", jobTitle: "Стоматолог",
-    image: SITE_URL + "/assets/img/kudryavtseva-front-860.jpg", url: `${SITE_URL}/about.html`, knowsAbout: SPECS,
+    "@context": "https://schema.org", "@type": "ProfilePage", url: `${SITE_URL}/about.html`, name: `${DOCTOR} — стоматолог ${CITY_IN}`,
+    mainEntity: personLd(),
   })}</script>${crumbsLd([{ name: "О докторе", path: "about.html" }])}`,
   body: (p) => `
 <section class="page-hero">
@@ -561,7 +671,7 @@ pages.push({
       <span class="eyebrow">О докторе</span>
       <h1>Кудрявцева <span class="nobr">Анна Дмитриевна</span></h1>
       <ul class="specs">${SPECS.map((s) => `<li>${s}</li>`).join("")}</ul>
-      <p class="lead">Ведущий стоматолог-терапевт — эндодонтист (микроскопист). Работает по специальности с 2018 года.</p>
+      <p class="lead">Ведущий стоматолог-терапевт — эндодонтист (микроскопист). Работает по специальности с 2018 года. Принимает пациентов ${CITY_IN}.</p>
       <div class="btn-row">
         <a class="btn btn--ghost" href="${p}services.html">Все услуги</a>
       </div>
@@ -656,9 +766,10 @@ ${bookingBand(p, "about")}
 pages.push({
   path: "cases.html",
   title: "Примеры работ",
+  seoTitle: `Примеры работ стоматолога ${CITY_IN}: фото до и после | ${SITE}`,
   active: "cases",
   cases: true,
-  description: "Примеры работ доктора Кудрявцевой: реальные клинические случаи — реставрация, перелечивание каналов, протезирование, имплантация.",
+  description: `Фото работ стоматолога Кудрявцевой А. Д. (${CITY}): реальные клинические случаи без ретуши — реставрация зубов, протезирование, имплантация.`,
   jsonld: crumbsLd([{ name: "Примеры работ", path: "cases.html" }]),
   body: (p) => `
 <section class="page-hero">
@@ -672,7 +783,7 @@ pages.push({
 <section class="section section--flush-top">
   <div class="container">
     <div class="filters" data-case-filters role="group" aria-label="Категории работ" hidden></div>
-    <div class="case-list" data-cases data-category="all" aria-live="polite"></div>
+    <div class="case-list" data-cases data-category="all" aria-live="polite">${casesStatic(p)}</div>
     <p class="cases-more" data-cfg="telegramChannel" data-cfg-mode="show" hidden><a class="link-arrow" data-cfg="telegramChannel" data-cfg-keep-text href="#"><span>А больше работ — в моём Telegram-канале</span>${ic("i-arrow")}</a></p>
     <p class="muted cases-note" data-cases-note hidden>${ic("i-info")}<span>Фотографии публикуются без ретуши. Результат лечения индивидуален.</span></p>
   </div>
@@ -688,8 +799,9 @@ const contactItem = (key, icon, label, text = "") =>
 pages.push({
   path: "contacts.html",
   title: "Контакты и запись",
+  seoTitle: `Записаться к стоматологу ${CITY_IN} — контакты | ${SITE}`,
   active: "contacts",
-  description: "Запись на приём к доктору Кудрявцевой: онлайн-форма, телефон и мессенджеры.",
+  description: `Запись на приём к стоматологу Кудрявцевой Анне Дмитриевне ${CITY_IN}: онлайн-форма с переходом в WhatsApp, Telegram. Консультация и план лечения.`,
   jsonld: crumbsLd([{ name: "Контакты", path: "contacts.html" }]),
   body: (p) => `
 <section class="page-hero">
@@ -697,7 +809,7 @@ pages.push({
     ${crumbs(p, [{ label: "Контакты" }])}
     <span class="eyebrow">Контакты</span>
     <h1>Контакты и запись</h1>
-    <p class="lead">Заполните форму — откроется WhatsApp с готовым сообщением. Или напишите напрямую в удобный мессенджер.</p>
+    <p class="lead">Приём ${CITY_IN} (${REGION}). Заполните форму — откроется WhatsApp с готовым сообщением. Или напишите напрямую в удобный мессенджер.</p>
   </div>
 </section>
 <section class="section section--flush-top">
@@ -840,6 +952,13 @@ for (const pg of pages) {
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, page(pg));
 }
+
+writeFileSync(join(ROOT, "favicon.svg"), decodeURIComponent(FAVICON.replace("data:image/svg+xml,", "")) + "\n");
+writeFileSync(join(ROOT, "site.webmanifest"), JSON.stringify({
+  name: `${SITE} — стоматолог ${CITY_IN}`, short_name: SITE, lang: "ru", start_url: "/", display: "browser",
+  background_color: "#fbf7f2", theme_color: "#fbf7f2",
+  icons: [{ src: "/icon-192.png", sizes: "192x192", type: "image/png" }, { src: "/icon-512.png", sizes: "512x512", type: "image/png" }],
+}, null, 2) + "\n");
 
 writeFileSync(join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 const today = new Date().toISOString().slice(0, 10);
