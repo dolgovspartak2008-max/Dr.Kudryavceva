@@ -9,7 +9,7 @@ import { SPECS, PERKS, STEPS, SERVICES, ABOUT, DOCS } from "./content.mjs";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 // Адрес сайта (без слеша в конце). При подключении своего домена — замените и пересоберите.
-const SITE_URL = "https://dr-kudryavceva.vercel.app";
+const SITE_URL = "https://dr-kudryavceva.online";
 
 const SITE = "Доктор Кудрявцева";
 // Версия ресурсов = хеш содержимого CSS/JS: при любой правке браузеры сразу берут свежие файлы.
