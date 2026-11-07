@@ -46,6 +46,17 @@
   ],
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "dr-kudryavceva.vercel.app"
+        }
+      ],
+      "destination": "https://dr-kudryavceva.online/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {
